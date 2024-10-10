@@ -1,3 +1,8 @@
-from django.contrib import admin  # noqa
+from django.contrib import admin
 
-# Register your models here.
+from .models import Entity
+
+
+@admin.register(Entity)
+class EntityAdmin(admin.ModelAdmin):
+    list_display = ("title", "description")
