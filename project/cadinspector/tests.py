@@ -1,8 +1,11 @@
 from pathlib import Path
 
 from django.conf import settings
+from django.contrib.auth.models import User
+from django.contrib.messages import get_messages
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
+from django.urls import reverse
 
 from .models import Entity, MaterialImage
 
@@ -36,6 +39,7 @@ class ModelTest(TestCase):
             entity=ent,
             image=SimpleUploadedFile("image_changed.jpg", img_content, "image/jpeg"),
         )
+        User.objects.create_superuser("boss", "test@example.com", "p4s5w0r6")
 
     @classmethod
     def tearDownClass(cls):
@@ -73,3 +77,36 @@ class ModelTest(TestCase):
             for line in f:
                 self.assertEqual(line, "before map_Ka image_changed.jpg\n")
                 break
+
+    def test_action_check_file_names_status_code(self):
+        ent = Entity.objects.get(title="Foo")
+        data = {
+            "action": "check_file_names",
+            "_selected_action": [
+                ent.id,
+            ],
+        }
+        change_url = reverse("admin:cadinspector_entity_changelist")
+        self.client.login(username="boss", password="p4s5w0r6")
+        response = self.client.post(change_url, data, follow=True)
+        self.client.logout()
+        self.assertEqual(response.status_code, 200)
+
+    def test_action_check_file_names_messages(self):
+        ent = Entity.objects.get(title="Foo")
+        data = {
+            "action": "check_file_names",
+            "_selected_action": [
+                ent.id,
+            ],
+        }
+        change_url = reverse("admin:cadinspector_entity_changelist")
+        self.client.login(username="boss", password="p4s5w0r6")
+        response = self.client.post(change_url, data, follow=True)
+        self.client.logout()
+        messages = [m.message for m in get_messages(response.wsgi_request)]
+        self.assertIn(f"Checked file: {ent.mtl_model.name}", messages)
+        self.assertIn(
+            f"Checked images for file: {ent.mtl_model.name}",
+            messages,
+        )
