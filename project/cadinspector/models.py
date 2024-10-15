@@ -54,7 +54,7 @@ class Entity(models.Model):
         null=True,
         blank=True,
     )
-    switch = models.BooleanField(default=False, help_text="Switch Z/Y axis")
+    switch = models.BooleanField(default=False, help_text=_("Switch Z/Y axis"))
 
     class Meta:
         verbose_name = _("Entity")
@@ -134,7 +134,7 @@ class MaterialImage(models.Model):
         Entity,
         on_delete=models.CASCADE,
         related_name="material_images",
-        verbose_name="Material image",
+        verbose_name=_("Material image"),
     )
     image = models.ImageField(upload_to="uploads/cadinspector/entity/")
 

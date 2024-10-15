@@ -105,7 +105,7 @@ class ModelTest(TestCase):
         response = self.client.post(change_url, data, follow=True)
         self.client.logout()
         messages = [m.message for m in get_messages(response.wsgi_request)]
-        self.assertIn(f"Checked file: {ent.mtl_model.name}", messages)
+        self.assertIn(f"Checked file: {ent.obj_model.name}", messages)
         self.assertIn(
             f"Checked images for file: {ent.mtl_model.name}",
             messages,
