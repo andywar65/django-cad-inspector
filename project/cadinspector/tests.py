@@ -4,7 +4,7 @@ from django.conf import settings
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
 
-from .models import Entity
+from .models import Entity, MaterialImage
 
 
 @override_settings(MEDIA_ROOT=Path(settings.MEDIA_ROOT).joinpath("tests"))
@@ -17,14 +17,24 @@ class ModelTest(TestCase):
         mtl_path = Path(settings.BASE_DIR).joinpath(
             "cadinspector/static/cadinspector/tests/blue_changed.mtl"
         )
-        with open(obj_path, "rb") as fobj, open(mtl_path, "rb") as fmtl:
+        img_path = Path(settings.BASE_DIR).joinpath(
+            "cadinspector/static/cadinspector/tests/image_changed.jpg"
+        )
+        with open(obj_path, "rb") as fobj, open(mtl_path, "rb") as fmtl, open(
+            img_path, "rb"
+        ) as fimg:
             obj_content = fobj.read()
             mtl_content = fmtl.read()
-        Entity.objects.create(
+            img_content = fimg.read()
+        ent = Entity.objects.create(
             title="Foo",
             description="bar",
             obj_model=SimpleUploadedFile("blue.obj", obj_content, "text/plain"),
             mtl_model=SimpleUploadedFile("blue_changed.mtl", mtl_content, "text/plain"),
+        )
+        MaterialImage.objects.create(
+            entity=ent,
+            image=SimpleUploadedFile("image_changed.jpg", img_content, "image/jpeg"),
         )
 
     @classmethod
@@ -51,4 +61,15 @@ class ModelTest(TestCase):
         with open(path, "r") as f:
             for line in f:
                 self.assertEqual(line, "mtllib blue_changed.mtl\n")
+                break
+
+    def test_entity_check_image_file_name(self):
+        ent = Entity.objects.get(title="Foo")
+        ent.check_image_file_name()
+        path = Path(settings.MEDIA_ROOT).joinpath(
+            "uploads/cadinspector/entity/blue_changed.mtl"
+        )
+        with open(path, "r") as f:
+            for line in f:
+                self.assertEqual(line, "before map_Ka image_changed.jpg\n")
                 break
