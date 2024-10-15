@@ -2,3 +2,4 @@ django>=5.1,<6.0
 ezdxf
 coverage
 pre-commit
+Pillow

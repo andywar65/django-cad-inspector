@@ -85,3 +85,16 @@ class Entity(models.Model):
         with open(obj_path, "w") as o_f, open(helper_path, "r") as h_f:
             for line in h_f:
                 o_f.write(line)
+
+
+class MaterialImage(models.Model):
+    entity = models.ForeignKey(
+        Entity,
+        on_delete=models.CASCADE,
+        related_name="material_images",
+        verbose_name="Material image",
+    )
+    image = models.ImageField(upload_to="uploads/cadinspector/entity/")
+
+    def __str__(self):
+        return Path(self.image.url).name
