@@ -1,7 +1,7 @@
 from django.contrib import admin, messages
 from django.utils.translation import gettext_lazy as _
 
-from .models import Entity, MaterialImage, Scene
+from .models import Entity, MaterialImage, Scene, Staging
 
 
 class MaterialImageInline(admin.TabularInline):
@@ -37,6 +37,14 @@ class EntityAdmin(admin.ModelAdmin):
                 )
 
 
+class StagingInline(admin.TabularInline):
+    model = Staging
+    extra = 0
+
+
 @admin.register(Scene)
 class SceneAdmin(admin.ModelAdmin):
     list_display = ("title", "description")
+    inlines = [
+        StagingInline,
+    ]

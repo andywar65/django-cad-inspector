@@ -183,3 +183,47 @@ class Scene(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Staging(models.Model):
+    scene = models.ForeignKey(
+        Scene,
+        on_delete=models.CASCADE,
+        related_name="staged_entities",
+    )
+    entity = models.ForeignKey(
+        Entity,
+        on_delete=models.CASCADE,
+        related_name="scenes",
+    )
+    position = models.CharField(
+        _("Position"),
+        default="0 0 0",
+        max_length=50,
+        help_text="Left/Right - Up/Down - In/Out",
+    )
+    rotation = models.CharField(
+        _("Rotation"),
+        default="0 0 0",
+        max_length=50,
+        help_text="Pitch - Yaw - Roll",
+    )
+    scale = models.CharField(
+        _("Scale"),
+        default="1 1 1",
+        max_length=50,
+        help_text="Width - Heigth - Depth",
+    )
+    color = models.CharField(_("Color"), default="#FFFFFF", max_length=7)
+    data = models.JSONField(
+        _("Data sheet"),
+        null=True,
+        blank=True,
+    )
+
+    class Meta:
+        verbose_name = _("Staging")
+        verbose_name_plural = _("Stagings")
+
+    def __str__(self):
+        return _("Staging %(id)d") % {"id": self.id}
