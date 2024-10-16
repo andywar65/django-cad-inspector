@@ -7,7 +7,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
 from django.urls import reverse
 
-from .models import Entity, MaterialImage, Scene
+from .models import Entity, MaterialImage, Scene, Staging
 
 
 @override_settings(MEDIA_ROOT=Path(settings.MEDIA_ROOT).joinpath("tests"))
@@ -40,9 +40,13 @@ class ModelTest(TestCase):
             image=SimpleUploadedFile("image_changed.jpg", img_content, "image/jpeg"),
         )
         User.objects.create_superuser("boss", "test@example.com", "p4s5w0r6")
-        Scene.objects.create(
+        scn = Scene.objects.create(
             title="Foo",
             description="baz",
+        )
+        Staging.objects.create(
+            scene=scn,
+            entity=ent,
         )
 
     @classmethod
@@ -118,3 +122,8 @@ class ModelTest(TestCase):
     def test_scene_str_method(self):
         scn = Scene.objects.get(title="Foo")
         self.assertEqual(scn.__str__(), "Foo")
+
+    def test_staging_str_method(self):
+        scn = Scene.objects.get(title="Foo")
+        stg = scn.staged_entities.first()
+        self.assertEqual(stg.__str__(), f"Staging-{stg.id}")

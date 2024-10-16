@@ -226,4 +226,4 @@ class Staging(models.Model):
         verbose_name_plural = _("Stagings")
 
     def __str__(self):
-        return _("Staging %(id)d") % {"id": self.id}
+        return _("Staging-%(id)d") % {"id": self.id}
