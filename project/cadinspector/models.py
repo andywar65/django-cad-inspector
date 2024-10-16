@@ -177,13 +177,30 @@ class Scene(models.Model):
         null=True,
         blank=True,
     )
+    __original_dxf = None
 
     class Meta:
         verbose_name = _("Scene")
         verbose_name_plural = _("Scenes")
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.__original_dxf = self.dxf
+
     def __str__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        # save and eventually upload DXF
+        super().save(*args, **kwargs)
+        if self.__original_dxf != self.dxf:
+            all_objects = self.staged_entities.all()
+            if all_objects.exists():
+                all_objects.delete()
+            self.create_objs_from_dxf()
+
+    def create_objs_from_dxf(self):
+        pass
 
 
 class Staging(models.Model):
