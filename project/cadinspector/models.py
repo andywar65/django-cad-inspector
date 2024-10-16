@@ -202,7 +202,32 @@ class Scene(models.Model):
             self.create_objs_from_dxf()
 
     def create_objs_from_dxf(self):
-        pass
+        doc = ezdxf.readfile(self.dxf.path)
+        layer_dict = make_layer_dict(doc)  # noqa
+
+
+"""
+    Collection of utilities used by
+    create_objs_from_dxf
+"""
+
+
+def cad2hex(color):
+    if isinstance(color, tuple):
+        return "#{:02x}{:02x}{:02x}".format(color[0], color[1], color[2])
+    rgb24 = ezdxf.colors.DXF_DEFAULT_COLORS[color]
+    return "#{:06X}".format(rgb24)
+
+
+def make_layer_dict(doc):
+    layer_dict = {}
+    for layer in doc.layers:
+        if layer.rgb:
+            color = cad2hex(layer.rgb)
+        else:
+            color = cad2hex(layer.color)
+        layer_dict[layer.dxf.name] = color
+    return layer_dict
 
 
 class Staging(models.Model):
@@ -261,15 +286,3 @@ class Staging(models.Model):
                 else:
                     out += f"{nh3.clean(key)}: {nh3.clean(value)}\n"
             return out
-
-
-"""
-    Collection of utilities
-"""
-
-
-def cad2hex(color):
-    if isinstance(color, tuple):
-        return "#{:02x}{:02x}{:02x}".format(color[0], color[1], color[2])
-    rgb24 = ezdxf.colors.DXF_DEFAULT_COLORS[color]
-    return "#{:06X}".format(rgb24)
