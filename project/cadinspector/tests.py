@@ -7,7 +7,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
 from django.urls import reverse
 
-from .models import Entity, MaterialImage
+from .models import Entity, MaterialImage, Scene
 
 
 @override_settings(MEDIA_ROOT=Path(settings.MEDIA_ROOT).joinpath("tests"))
@@ -40,6 +40,10 @@ class ModelTest(TestCase):
             image=SimpleUploadedFile("image_changed.jpg", img_content, "image/jpeg"),
         )
         User.objects.create_superuser("boss", "test@example.com", "p4s5w0r6")
+        Scene.objects.create(
+            title="Foo",
+            description="baz",
+        )
 
     @classmethod
     def tearDownClass(cls):
@@ -110,3 +114,7 @@ class ModelTest(TestCase):
             f"Checked images for file: {ent.mtl_model.name}",
             messages,
         )
+
+    def test_scene_str_method(self):
+        scn = Scene.objects.get(title="Foo")
+        self.assertEqual(scn.__str__(), "Foo")
