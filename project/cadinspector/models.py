@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import nh3
+from colorfield.fields import ColorField
 from django.conf import settings
 from django.core.validators import FileExtensionValidator
 from django.db import models
@@ -232,7 +233,7 @@ class Staging(models.Model):
         max_length=50,
         help_text="Width - Heigth - Depth",
     )
-    color = models.CharField(_("Color"), default="#FFFFFF", max_length=7)
+    color = ColorField(_("Color"), default="#FFFFFF")
     data = models.JSONField(
         _("Data sheet"),
         null=True,
