@@ -142,3 +142,10 @@ class ModelTest(TestCase):
         stg.data = {"Key": "Foo"}
         stg.save()
         self.assertEqual(stg.popupContent(), "Key: Foo\n")
+
+    def test_staging_popupcontent_method_attribs(self):
+        scn = Scene.objects.get(title="Foo")
+        stg = scn.staged_entities.first()
+        stg.data = {"attribs": {"Key": "Foo"}}
+        stg.save()
+        self.assertEqual(stg.popupContent(), "Attributes:\n--Key: Foo\n")
