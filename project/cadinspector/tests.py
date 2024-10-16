@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import ezdxf
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.messages import get_messages
@@ -7,7 +8,14 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
 from django.urls import reverse
 
-from .models import Entity, MaterialImage, Scene, Staging, cad2hex
+from .models import (
+    Entity, 
+    MaterialImage, 
+    Scene, 
+    Staging, 
+    cad2hex,
+    make_layer_dict,
+)
 
 
 @override_settings(MEDIA_ROOT=Path(settings.MEDIA_ROOT).joinpath("tests"))
@@ -23,12 +31,17 @@ class ModelTest(TestCase):
         img_path = Path(settings.BASE_DIR).joinpath(
             "cadinspector/static/cadinspector/tests/image_changed.jpg"
         )
-        with open(obj_path, "rb") as fobj, open(mtl_path, "rb") as fmtl, open(
-            img_path, "rb"
-        ) as fimg:
+        dxf_path = Path(settings.BASE_DIR).joinpath(
+            "cadinspector/static/cadinspector/tests/sample.dxf"
+        )
+        with open(obj_path, "rb") as fobj:
             obj_content = fobj.read()
+        with open(mtl_path, "rb") as fmtl:
             mtl_content = fmtl.read()
+        with open(img_path, "rb") as fimg:
             img_content = fimg.read()
+        with open(dxf_path, "rb") as fdxf:
+            dxf_content = fdxf.read()
         ent = Entity.objects.create(
             title="Foo",
             description="bar",
@@ -43,6 +56,7 @@ class ModelTest(TestCase):
         scn = Scene.objects.create(
             title="Foo",
             description="baz",
+            dxf=SimpleUploadedFile("sample.dxf", dxf_content, "image/x-dxf"),
         )
         Staging.objects.create(
             scene=scn,
@@ -157,3 +171,9 @@ class ModelTest(TestCase):
     def test_cad2hex_default(self):
         color = 128
         self.assertEqual(cad2hex(color), "#00261C")
+
+    def test_make_layer_dict(self):
+        scn = Scene.objects.get(title="Foo")
+        doc = ezdxf.readfile(scn.dxf.path)
+        layer_dict = make_layer_dict(doc)
+        self.assertEqual(layer_dict["0"], "#FFFFFF")
