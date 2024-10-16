@@ -1,5 +1,8 @@
 from pathlib import Path
 
+import ezdxf
+import nh3
+from colorfield.fields import ColorField
 from django.conf import settings
 from django.core.validators import FileExtensionValidator
 from django.db import models
@@ -8,11 +11,13 @@ from django.utils.translation import gettext_lazy as _
 
 class Entity(models.Model):
 
-    title = models.CharField(max_length=50)
-    description = models.TextField(max_length=500, null=True, blank=True)
+    title = models.CharField(_("Title"), max_length=50)
+    description = models.TextField(
+        _("Description"), max_length=500, null=True, blank=True
+    )
     gltf_model = models.FileField(
         _("GLTF file"),
-        help_text=_("Overrides all other entries"),
+        help_text=_("Overrides OBJ/MTL entries"),
         max_length=200,
         upload_to="uploads/cadinspector/entity/",
         validators=[
@@ -54,7 +59,11 @@ class Entity(models.Model):
         null=True,
         blank=True,
     )
-    switch = models.BooleanField(default=False, help_text="Switch Z/Y axis")
+    switch = models.BooleanField(
+        _("Switch Z/Y axis"),
+        help_text=_("Select if coming from CAD environments"),
+        default=False,
+    )
 
     class Meta:
         verbose_name = _("Entity")
@@ -134,9 +143,146 @@ class MaterialImage(models.Model):
         Entity,
         on_delete=models.CASCADE,
         related_name="material_images",
-        verbose_name="Material image",
+        verbose_name=_("Material image"),
     )
-    image = models.ImageField(upload_to="uploads/cadinspector/entity/")
+    image = models.ImageField(_("Image"), upload_to="uploads/cadinspector/entity/")
 
     def __str__(self):
         return Path(self.image.url).name
+
+
+class Scene(models.Model):
+
+    title = models.CharField(_("Title"), max_length=50)
+    description = models.TextField(
+        _("Description"), max_length=500, null=True, blank=True
+    )
+    dxf = models.FileField(
+        _("DXF file"),
+        help_text=_("Please, transform 3DSolids into Meshes before upload"),
+        max_length=200,
+        upload_to="uploads/cadinspector/scene/",
+        null=True,
+        blank=True,
+        validators=[
+            FileExtensionValidator(
+                allowed_extensions=[
+                    "dxf",
+                ]
+            )
+        ],
+    )
+    image = models.ImageField(
+        _("Background image"),
+        help_text=_("Please provide an equirectangular image"),
+        upload_to="uploads/cadinspector/scene/",
+        null=True,
+        blank=True,
+    )
+    __original_dxf = None
+
+    class Meta:
+        verbose_name = _("Scene")
+        verbose_name_plural = _("Scenes")
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.__original_dxf = self.dxf
+
+    def __str__(self):
+        return self.title
+
+    def save(self, *args, **kwargs):
+        # save and eventually upload DXF
+        super().save(*args, **kwargs)
+        if self.__original_dxf != self.dxf:
+            all_objects = self.staged_entities.all()
+            if all_objects.exists():
+                all_objects.delete()
+            self.create_objs_from_dxf()
+
+    def create_objs_from_dxf(self):
+        doc = ezdxf.readfile(self.dxf.path)
+        layer_dict = make_layer_dict(doc)  # noqa
+
+
+"""
+    Collection of utilities used by
+    create_objs_from_dxf
+"""
+
+
+def cad2hex(color):
+    if isinstance(color, tuple):
+        return "#{:02x}{:02x}{:02x}".format(color[0], color[1], color[2])
+    rgb24 = ezdxf.colors.DXF_DEFAULT_COLORS[color]
+    return "#{:06X}".format(rgb24)
+
+
+def make_layer_dict(doc):
+    layer_dict = {}
+    for layer in doc.layers:
+        if layer.rgb:
+            color = cad2hex(layer.rgb)
+        else:
+            color = cad2hex(layer.color)
+        layer_dict[layer.dxf.name] = color
+    return layer_dict
+
+
+class Staging(models.Model):
+    scene = models.ForeignKey(
+        Scene,
+        on_delete=models.CASCADE,
+        related_name="staged_entities",
+    )
+    entity = models.ForeignKey(
+        Entity,
+        on_delete=models.CASCADE,
+        related_name="scenes",
+    )
+    position = models.CharField(
+        _("Position"),
+        default="0 0 0",
+        max_length=50,
+        help_text="Left/Right - Up/Down - In/Out",
+    )
+    rotation = models.CharField(
+        _("Rotation"),
+        default="0 0 0",
+        max_length=50,
+        help_text="Pitch - Yaw - Roll",
+    )
+    scale = models.CharField(
+        _("Scale"),
+        default="1 1 1",
+        max_length=50,
+        help_text="Width - Heigth - Depth",
+    )
+    color = ColorField(_("Color"), default="#FFFFFF")
+    data = models.JSONField(
+        _("Data sheet"),
+        null=True,
+        blank=True,
+    )
+
+    class Meta:
+        verbose_name = _("Staging")
+        verbose_name_plural = _("Stagings")
+
+    def __str__(self):
+        return _("Staging-%(id)d") % {"id": self.id}
+
+    def popupContent(self):
+        if not self.data:
+            return
+        else:
+            out = ""
+            for key, value in self.data.items():
+                if key == "attribs":
+                    out += _("Attributes:\n")
+                    for t, v in value.items():
+                        out += f"--{nh3.clean(t)}: {nh3.clean(v)}\n"
+                else:
+                    out += f"{nh3.clean(key)}: {nh3.clean(value)}\n"
+            return out

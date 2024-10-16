@@ -3,3 +3,5 @@ ezdxf
 coverage
 pre-commit
 Pillow
+nh3
+django-colorfield

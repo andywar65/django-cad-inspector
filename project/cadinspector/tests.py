@@ -7,7 +7,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
 from django.urls import reverse
 
-from .models import Entity, MaterialImage
+from .models import Entity, MaterialImage, Scene, Staging, cad2hex
 
 
 @override_settings(MEDIA_ROOT=Path(settings.MEDIA_ROOT).joinpath("tests"))
@@ -40,6 +40,17 @@ class ModelTest(TestCase):
             image=SimpleUploadedFile("image_changed.jpg", img_content, "image/jpeg"),
         )
         User.objects.create_superuser("boss", "test@example.com", "p4s5w0r6")
+        scn = Scene.objects.create(
+            title="Foo",
+            description="baz",
+        )
+        Staging.objects.create(
+            scene=scn,
+            entity=ent,
+            data={
+                "Key": "<script>alert('Foo')</script>",
+            },
+        )
 
     @classmethod
     def tearDownClass(cls):
@@ -105,8 +116,44 @@ class ModelTest(TestCase):
         response = self.client.post(change_url, data, follow=True)
         self.client.logout()
         messages = [m.message for m in get_messages(response.wsgi_request)]
-        self.assertIn(f"Checked file: {ent.mtl_model.name}", messages)
+        self.assertIn(f"Checked file: {ent.obj_model.name}", messages)
         self.assertIn(
             f"Checked images for file: {ent.mtl_model.name}",
             messages,
         )
+
+    def test_scene_str_method(self):
+        scn = Scene.objects.get(title="Foo")
+        self.assertEqual(scn.__str__(), "Foo")
+
+    def test_staging_str_method(self):
+        scn = Scene.objects.get(title="Foo")
+        stg = scn.staged_entities.first()
+        self.assertEqual(stg.__str__(), f"Staging-{stg.id}")
+
+    def test_staging_popupcontent_method_bleached(self):
+        scn = Scene.objects.get(title="Foo")
+        stg = scn.staged_entities.first()
+        self.assertEqual(stg.popupContent(), "Key: \n")
+
+    def test_staging_popupcontent_method(self):
+        scn = Scene.objects.get(title="Foo")
+        stg = scn.staged_entities.first()
+        stg.data = {"Key": "Foo"}
+        stg.save()
+        self.assertEqual(stg.popupContent(), "Key: Foo\n")
+
+    def test_staging_popupcontent_method_attribs(self):
+        scn = Scene.objects.get(title="Foo")
+        stg = scn.staged_entities.first()
+        stg.data = {"attribs": {"Key": "Foo"}}
+        stg.save()
+        self.assertEqual(stg.popupContent(), "Attributes:\n--Key: Foo\n")
+
+    def test_cad2hex_tuple(self):
+        color = (128, 128, 128)
+        self.assertEqual(cad2hex(color), "#808080")
+
+    def test_cad2hex_default(self):
+        color = 128
+        self.assertEqual(cad2hex(color), "#00261C")
