@@ -7,7 +7,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
 from django.urls import reverse
 
-from .models import Entity, MaterialImage, Scene, Staging
+from .models import Entity, MaterialImage, Scene, Staging, cad2hex
 
 
 @override_settings(MEDIA_ROOT=Path(settings.MEDIA_ROOT).joinpath("tests"))
@@ -149,3 +149,11 @@ class ModelTest(TestCase):
         stg.data = {"attribs": {"Key": "Foo"}}
         stg.save()
         self.assertEqual(stg.popupContent(), "Attributes:\n--Key: Foo\n")
+
+    def test_cad2hex_tuple(self):
+        color = (128, 128, 128)
+        self.assertEqual(cad2hex(color), "#808080")
+
+    def test_cad2hex_default(self):
+        color = 128
+        self.assertEqual(cad2hex(color), "#00261C")
