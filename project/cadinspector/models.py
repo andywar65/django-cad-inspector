@@ -8,11 +8,13 @@ from django.utils.translation import gettext_lazy as _
 
 class Entity(models.Model):
 
-    title = models.CharField(max_length=50)
-    description = models.TextField(max_length=500, null=True, blank=True)
+    title = models.CharField(_("Title"), max_length=50)
+    description = models.TextField(
+        _("Description"), max_length=500, null=True, blank=True
+    )
     gltf_model = models.FileField(
         _("GLTF file"),
-        help_text=_("Overrides all other entries"),
+        help_text=_("Overrides OBJ/MTL entries"),
         max_length=200,
         upload_to="uploads/cadinspector/entity/",
         validators=[
@@ -54,7 +56,11 @@ class Entity(models.Model):
         null=True,
         blank=True,
     )
-    switch = models.BooleanField(default=False, help_text=_("Switch Z/Y axis"))
+    switch = models.BooleanField(
+        _("Switch Z/Y axis"),
+        help_text=_("Select if coming from CAD environments"),
+        default=False,
+    )
 
     class Meta:
         verbose_name = _("Entity")
@@ -136,7 +142,44 @@ class MaterialImage(models.Model):
         related_name="material_images",
         verbose_name=_("Material image"),
     )
-    image = models.ImageField(upload_to="uploads/cadinspector/entity/")
+    image = models.ImageField(_("Image"), upload_to="uploads/cadinspector/entity/")
 
     def __str__(self):
         return Path(self.image.url).name
+
+
+class Scene(models.Model):
+
+    title = models.CharField(_("Title"), max_length=50)
+    description = models.TextField(
+        _("Description"), max_length=500, null=True, blank=True
+    )
+    dxf = models.FileField(
+        _("DXF file"),
+        help_text=_("Please, transform 3DSolids into Meshes before upload"),
+        max_length=200,
+        upload_to="uploads/cadinspector/scene/",
+        null=True,
+        blank=True,
+        validators=[
+            FileExtensionValidator(
+                allowed_extensions=[
+                    "dxf",
+                ]
+            )
+        ],
+    )
+    image = models.ImageField(
+        _("Background image"),
+        help_text=_("Please provide an equirectangular image"),
+        upload_to="uploads/cadinspector/scene/",
+        null=True,
+        blank=True,
+    )
+
+    class Meta:
+        verbose_name = _("Scene")
+        verbose_name_plural = _("Scenes")
+
+    def __str__(self):
+        return self.title
