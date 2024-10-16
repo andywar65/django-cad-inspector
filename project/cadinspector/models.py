@@ -1,5 +1,6 @@
 from pathlib import Path
 
+import nh3
 from django.conf import settings
 from django.core.validators import FileExtensionValidator
 from django.db import models
@@ -227,3 +228,17 @@ class Staging(models.Model):
 
     def __str__(self):
         return _("Staging-%(id)d") % {"id": self.id}
+
+    def popupContent(self):
+        if not self.data:
+            return
+        else:
+            out = ""
+            for key, value in self.data.items():
+                if key == "attribs":
+                    out += _("Attributes:\n")
+                    for t, v in value.items():
+                        out += f"--{nh3.clean(t)}: {nh3.clean(v)}\n"
+                else:
+                    out += f"{nh3.clean(key)}: {nh3.clean(value)}\n"
+            return out

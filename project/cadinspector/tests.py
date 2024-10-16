@@ -47,6 +47,9 @@ class ModelTest(TestCase):
         Staging.objects.create(
             scene=scn,
             entity=ent,
+            data={
+                "Key": "<script>alert('Foo')</script>",
+            },
         )
 
     @classmethod
@@ -127,3 +130,15 @@ class ModelTest(TestCase):
         scn = Scene.objects.get(title="Foo")
         stg = scn.staged_entities.first()
         self.assertEqual(stg.__str__(), f"Staging-{stg.id}")
+
+    def test_staging_popupcontent_method_bleached(self):
+        scn = Scene.objects.get(title="Foo")
+        stg = scn.staged_entities.first()
+        self.assertEqual(stg.popupContent(), "Key: \n")
+
+    def test_staging_popupcontent_method(self):
+        scn = Scene.objects.get(title="Foo")
+        stg = scn.staged_entities.first()
+        stg.data = {"Key": "Foo"}
+        stg.save()
+        self.assertEqual(stg.popupContent(), "Key: Foo\n")
