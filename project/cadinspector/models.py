@@ -218,8 +218,8 @@ class Scene(models.Model):
         )
         # iterate over layers
         for name, color in layer_dict.items():
-            query = f"MESH[layer=='{name}']"
-            self.record_vertex_number(path, msp, query)
+            query = msp.query(f"MESH[layer=='{name}']")
+            self.record_vertex_number(path, query)
             is_mesh = self.offset_face_number(path, path2)
             if not is_mesh:
                 continue
@@ -232,9 +232,9 @@ class Scene(models.Model):
             ]:
                 continue
 
-    def record_vertex_number(self, path, msp, query):
+    def record_vertex_number(self, path, query):
         with open(path, "w") as f:
-            for m in msp.query(query):
+            for m in query:
                 mb = MeshBuilder()
                 mb.vertices = Vec3.list(m.vertices)
                 mb.faces = m.faces
