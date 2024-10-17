@@ -232,3 +232,13 @@ class ModelTest(TestCase):
         )
         is_mesh = scn.offset_face_number(path, path2)
         self.assertTrue(is_mesh)
+        entity = scn.create_block_entity(path2, block)
+        self.assertEqual(entity.title, "Block sample")
+        msp = doc.modelspace()
+        for ins in msp.query("INSERT[name=='sample']"):
+            scn.create_block_insertion(ins, block.name, entity, "#FF0000")
+            break
+        stg = Staging.objects.last()
+        self.assertEqual(stg.data["Block"], "sample")
+        self.assertEqual(stg.data["Layer"], "0")
+        self.assertEqual(stg.data["attribs"], {"FIRST": "pitch", "SECOND": "-30"})
