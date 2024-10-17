@@ -196,3 +196,6 @@ class ModelTest(TestCase):
         )
         is_mesh = scn.offset_face_number(path, path2)
         self.assertTrue(is_mesh)
+        scn.create_staged_entity(path2, "red", "#FF0000")
+        stg = Staging.objects.last()
+        self.assertEqual(stg.data, {"Layer": "red"})

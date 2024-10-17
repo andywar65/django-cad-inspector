@@ -267,7 +267,7 @@ class Scene(models.Model):
                 scene=self,
                 entity=entity,
                 color=color,
-                data={_("Layer"): name},
+                data={"Layer": name},
             )
 
     def cad2hex(self, color):
