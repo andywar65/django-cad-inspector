@@ -1,3 +1,4 @@
+from math import asin, atan2, copysign, cos, degrees, fabs, pi  # noqa
 from pathlib import Path
 
 import ezdxf
@@ -238,6 +239,22 @@ class Scene(models.Model):
                 continue
             entity = self.create_block_entity(path2, block)  # noqa
 
+    def make_layer_dict(self, doc):
+        layer_dict = {}
+        for layer in doc.layers:
+            if layer.rgb:
+                color = self.cad2hex(layer.rgb)
+            else:
+                color = self.cad2hex(layer.color)
+            layer_dict[layer.dxf.name] = color
+        return layer_dict
+
+    def cad2hex(self, color):
+        if isinstance(color, tuple):
+            return "#{:02x}{:02x}{:02x}".format(color[0], color[1], color[2])
+        rgb24 = ezdxf.colors.DXF_DEFAULT_COLORS[color]
+        return "#{:06X}".format(rgb24)
+
     def record_vertex_number(self, path, query):
         with open(path, "w") as f:
             for m in query:
@@ -295,21 +312,37 @@ class Scene(models.Model):
             )
         return entity
 
-    def cad2hex(self, color):
-        if isinstance(color, tuple):
-            return "#{:02x}{:02x}{:02x}".format(color[0], color[1], color[2])
-        rgb24 = ezdxf.colors.DXF_DEFAULT_COLORS[color]
-        return "#{:06X}".format(rgb24)
+    def rotation_matrix_to_euler_angles_zyx(self, R):
+        """
+        From https://github.com/duolu/pyrotation
 
-    def make_layer_dict(self, doc):
-        layer_dict = {}
-        for layer in doc.layers:
-            if layer.rgb:
-                color = self.cad2hex(layer.rgb)
-            else:
-                color = self.cad2hex(layer.color)
-            layer_dict[layer.dxf.name] = color
-        return layer_dict
+        Converting a rotation matrix representation to
+        a rotation represented by three Euler angles (z-y'-x").
+
+        CAUTION: Euler angles have a singularity when pitch = pi / 2 or - pi / 2,
+        i.e., gimbal lock. In this case, yaw and roll angles can not be determined
+        uniquely, and this function always return a zero yaw angle.
+
+        """
+        # This is the floating point error tolerance.
+        EPSILON = 1e-6
+        if fabs(fabs(R[2, 0]) - 1) < EPSILON:
+            # cos(y) != 0, gimbal lock
+            # CAUTION: y is always pi/2, and z is always 0
+            y = copysign(pi / 2, -R[2, 0])
+            x = 0
+            z = atan2(R[0, 1], R[0, 2])
+            gimbal_lock = True
+            # print('gimbal lock!!!')
+        else:
+            # cos(y) == 0, normal situation
+            # CAUTION: y is always in [-pi/2, pi/2]
+            y = -asin(R[2, 0])
+            cy = cos(y)
+            x = atan2(R[2, 1] / cy, R[2, 2] / cy)
+            z = atan2(R[1, 0] / cy, R[0, 0] / cy)
+            gimbal_lock = False
+        return z, y, x, gimbal_lock
 
 
 class Staging(models.Model):
