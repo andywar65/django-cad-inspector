@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import ezdxf
+import numpy as np
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.messages import get_messages
@@ -80,6 +81,11 @@ class ModelTest(TestCase):
     def test_entity_str_method(self):
         ent = Entity.objects.get(title="Foo")
         self.assertEqual(ent.__str__(), "Foo")
+
+    def test_metrial_image_str_method(self):
+        ent = Entity.objects.get(title="Foo")
+        mtlimg = ent.material_images.first()
+        self.assertEqual(mtlimg.__str__(), "image_changed.jpg")
 
     def test_entity_check_material_file_name(self):
         ent = Entity.objects.get(title="Foo")
@@ -199,7 +205,8 @@ class ModelTest(TestCase):
         doc = ezdxf.readfile(scn.dxf.path)
         msp = doc.modelspace()
         path = Path(settings.MEDIA_ROOT).joinpath("uploads/cadinspector/scene/temp.obj")
-        scn.record_vertex_number(path, msp, "red")
+        query = msp.query("MESH[layer=='red']")
+        scn.record_vertex_number(path, query)
         with open(path, "r") as f:
             for line in f:
                 if line.startswith("# total vertices="):
@@ -213,3 +220,43 @@ class ModelTest(TestCase):
         scn.create_staged_entity(path2, "red", "#FF0000")
         stg = Staging.objects.last()
         self.assertEqual(stg.data, {"Layer": "red"})
+
+    def test_block_creation_process(self):
+        scn = Scene.objects.get(title="Foo")
+        doc = ezdxf.readfile(scn.dxf.path)
+        block = doc.blocks["sample"]
+        path = Path(settings.MEDIA_ROOT).joinpath("uploads/cadinspector/scene/temp.obj")
+        query = block.query("MESH")
+        scn.record_vertex_number(path, query)
+        with open(path, "r") as f:
+            for line in f:
+                if line.startswith("# total vertices="):
+                    break
+        self.assertEqual(line, "# total vertices=24\n")
+        path2 = Path(settings.MEDIA_ROOT).joinpath(
+            "uploads/cadinspector/scene/temp2.obj"
+        )
+        is_mesh = scn.offset_face_number(path, path2)
+        self.assertTrue(is_mesh)
+        entity = scn.create_block_entity(path2, block)
+        self.assertEqual(entity.title, "Block sample")
+        msp = doc.modelspace()
+        for ins in msp.query("INSERT[name=='sample']"):
+            scn.create_block_insertion(ins, block.name, entity, "#FF0000")
+            break
+        stg = Staging.objects.last()
+        self.assertEqual(stg.data["Block"], "sample")
+        self.assertEqual(stg.data["Layer"], "0")
+        self.assertEqual(stg.data["attribs"], {"FIRST": "pitch", "SECOND": "-30"})
+
+    def test_rotation_matrix_to_euler_angles(self):
+        scn = Scene.objects.get(title="Foo")
+        doc = ezdxf.readfile(scn.dxf.path)
+        msp = doc.modelspace()
+        for ins in msp.query("INSERT[name=='sample']"):
+            R = np.asarray([list(ins.ucs().ux), list(ins.ucs().uy), list(ins.ucs().uz)])
+            yaw, roll, pitch, gimbal_lock = scn.rotation_matrix_to_euler_angles_zyx(R)
+            break
+        self.assertEqual(yaw, 1.2246467991473535e-16)
+        self.assertEqual(roll, -0.0)
+        self.assertEqual(pitch, 0.523598775598299)
