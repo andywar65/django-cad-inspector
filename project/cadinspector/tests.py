@@ -180,6 +180,20 @@ class ModelTest(TestCase):
         layer_dict = scn.make_layer_dict(doc)
         self.assertEqual(layer_dict["0"], "#FFFFFF")
 
+    def test_scene_save_method(self):
+        scn = Scene.objects.get(title="Foo")
+        stg_before = scn.staged_entities.first()
+        dxf_path = Path(settings.BASE_DIR).joinpath(
+            "cadinspector/static/cadinspector/tests/sample.dxf"
+        )
+        with open(dxf_path, "rb") as fdxf:
+            dxf_content = fdxf.read()
+        scn.dxf = SimpleUploadedFile("sample.dxf", dxf_content, "image/x-dxf")
+        scn.save()
+        self.assertIsNot(scn.dxf.name, "uploads/cadinspector/scene/sample.dxf")
+        stg_after = scn.staged_entities.first()
+        self.assertIsNot(stg_before.id, stg_after.id)
+
     def test_entity_creation_process(self):
         scn = Scene.objects.get(title="Foo")
         doc = ezdxf.readfile(scn.dxf.path)
