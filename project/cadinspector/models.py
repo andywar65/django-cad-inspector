@@ -1,4 +1,4 @@
-from math import asin, atan2, copysign, cos, degrees, fabs, pi  # noqa
+from math import asin, atan2, copysign, cos, degrees, fabs, pi
 from pathlib import Path
 
 import ezdxf

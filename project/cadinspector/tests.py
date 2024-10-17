@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import ezdxf
+import numpy as np
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.messages import get_messages
@@ -80,6 +81,11 @@ class ModelTest(TestCase):
     def test_entity_str_method(self):
         ent = Entity.objects.get(title="Foo")
         self.assertEqual(ent.__str__(), "Foo")
+
+    def test_metrial_image_str_method(self):
+        ent = Entity.objects.get(title="Foo")
+        mtlimg = ent.material_images.first()
+        self.assertEqual(mtlimg.__str__(), "image_changed.jpg")
 
     def test_entity_check_material_file_name(self):
         ent = Entity.objects.get(title="Foo")
@@ -242,3 +248,15 @@ class ModelTest(TestCase):
         self.assertEqual(stg.data["Block"], "sample")
         self.assertEqual(stg.data["Layer"], "0")
         self.assertEqual(stg.data["attribs"], {"FIRST": "pitch", "SECOND": "-30"})
+
+    def test_rotation_matrix_to_euler_angles(self):
+        scn = Scene.objects.get(title="Foo")
+        doc = ezdxf.readfile(scn.dxf.path)
+        msp = doc.modelspace()
+        for ins in msp.query("INSERT[name=='sample']"):
+            R = np.asarray([list(ins.ucs().ux), list(ins.ucs().uy), list(ins.ucs().uz)])
+            yaw, roll, pitch, gimbal_lock = scn.rotation_matrix_to_euler_angles_zyx(R)
+            break
+        self.assertEqual(yaw, 1.2246467991473535e-16)
+        self.assertEqual(roll, -0.0)
+        self.assertEqual(pitch, 0.523598775598299)
