@@ -203,31 +203,23 @@ class Scene(models.Model):
 
     def create_objs_from_dxf(self):
         doc = ezdxf.readfile(self.dxf.path)
-        layer_dict = make_layer_dict(doc)  # noqa
+        layer_dict = self.make_layer_dict(doc)  # noqa
 
+    def cad2hex(self, color):
+        if isinstance(color, tuple):
+            return "#{:02x}{:02x}{:02x}".format(color[0], color[1], color[2])
+        rgb24 = ezdxf.colors.DXF_DEFAULT_COLORS[color]
+        return "#{:06X}".format(rgb24)
 
-"""
-    Collection of utilities used by
-    create_objs_from_dxf
-"""
-
-
-def cad2hex(color):
-    if isinstance(color, tuple):
-        return "#{:02x}{:02x}{:02x}".format(color[0], color[1], color[2])
-    rgb24 = ezdxf.colors.DXF_DEFAULT_COLORS[color]
-    return "#{:06X}".format(rgb24)
-
-
-def make_layer_dict(doc):
-    layer_dict = {}
-    for layer in doc.layers:
-        if layer.rgb:
-            color = cad2hex(layer.rgb)
-        else:
-            color = cad2hex(layer.color)
-        layer_dict[layer.dxf.name] = color
-    return layer_dict
+    def make_layer_dict(self, doc):
+        layer_dict = {}
+        for layer in doc.layers:
+            if layer.rgb:
+                color = self.cad2hex(layer.rgb)
+            else:
+                color = self.cad2hex(layer.color)
+            layer_dict[layer.dxf.name] = color
+        return layer_dict
 
 
 class Staging(models.Model):

@@ -8,14 +8,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
 from django.urls import reverse
 
-from .models import (
-    Entity, 
-    MaterialImage, 
-    Scene, 
-    Staging, 
-    cad2hex,
-    make_layer_dict,
-)
+from .models import Entity, MaterialImage, Scene, Staging
 
 
 @override_settings(MEDIA_ROOT=Path(settings.MEDIA_ROOT).joinpath("tests"))
@@ -165,15 +158,17 @@ class ModelTest(TestCase):
         self.assertEqual(stg.popupContent(), "Attributes:\n--Key: Foo\n")
 
     def test_cad2hex_tuple(self):
+        scn = Scene.objects.get(title="Foo")
         color = (128, 128, 128)
-        self.assertEqual(cad2hex(color), "#808080")
+        self.assertEqual(scn.cad2hex(color), "#808080")
 
     def test_cad2hex_default(self):
+        scn = Scene.objects.get(title="Foo")
         color = 128
-        self.assertEqual(cad2hex(color), "#00261C")
+        self.assertEqual(scn.cad2hex(color), "#00261C")
 
     def test_make_layer_dict(self):
         scn = Scene.objects.get(title="Foo")
         doc = ezdxf.readfile(scn.dxf.path)
-        layer_dict = make_layer_dict(doc)
+        layer_dict = scn.make_layer_dict(doc)
         self.assertEqual(layer_dict["0"], "#FFFFFF")
