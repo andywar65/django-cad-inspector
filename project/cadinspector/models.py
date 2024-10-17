@@ -231,6 +231,11 @@ class Scene(models.Model):
                 "*Model_Space",
             ]:
                 continue
+            query = block.query("MESH")
+            self.record_vertex_number(path, query)
+            is_mesh = self.offset_face_number(path, path2)
+            if not is_mesh:
+                continue
 
     def record_vertex_number(self, path, query):
         with open(path, "w") as f:
