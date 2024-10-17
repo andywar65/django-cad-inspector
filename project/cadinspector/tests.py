@@ -199,7 +199,7 @@ class ModelTest(TestCase):
         doc = ezdxf.readfile(scn.dxf.path)
         msp = doc.modelspace()
         path = Path(settings.MEDIA_ROOT).joinpath("uploads/cadinspector/scene/temp.obj")
-        scn.record_vertex_number(path, msp, "red")
+        scn.record_vertex_number(path, msp, "MESH[layer=='red']")
         with open(path, "r") as f:
             for line in f:
                 if line.startswith("# total vertices="):

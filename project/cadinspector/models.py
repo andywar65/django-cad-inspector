@@ -218,15 +218,23 @@ class Scene(models.Model):
         )
         # iterate over layers
         for name, color in layer_dict.items():
-            self.record_vertex_number(path, msp, name)
+            query = f"MESH[layer=='{name}']"
+            self.record_vertex_number(path, msp, query)
             is_mesh = self.offset_face_number(path, path2)
             if not is_mesh:
                 continue
             self.create_staged_entity(path2, name, color)
+        # iterate over blocks
+        for block in doc.blocks:
+            # TODO add list of blacklisted blocks
+            if block.name in [
+                "*Model_Space",
+            ]:
+                continue
 
-    def record_vertex_number(self, path, msp, name):
+    def record_vertex_number(self, path, msp, query):
         with open(path, "w") as f:
-            for m in msp.query(f"MESH[layer=='{name}']"):
+            for m in msp.query(query):
                 mb = MeshBuilder()
                 mb.vertices = Vec3.list(m.vertices)
                 mb.faces = m.faces
