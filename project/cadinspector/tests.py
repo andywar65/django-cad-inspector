@@ -214,3 +214,21 @@ class ModelTest(TestCase):
         scn.create_staged_entity(path2, "red", "#FF0000")
         stg = Staging.objects.last()
         self.assertEqual(stg.data, {"Layer": "red"})
+
+    def test_block_creation_process(self):
+        scn = Scene.objects.get(title="Foo")
+        doc = ezdxf.readfile(scn.dxf.path)
+        block = doc.blocks["sample"]
+        path = Path(settings.MEDIA_ROOT).joinpath("uploads/cadinspector/scene/temp.obj")
+        query = block.query("MESH")
+        scn.record_vertex_number(path, query)
+        with open(path, "r") as f:
+            for line in f:
+                if line.startswith("# total vertices="):
+                    break
+        self.assertEqual(line, "# total vertices=24\n")
+        path2 = Path(settings.MEDIA_ROOT).joinpath(
+            "uploads/cadinspector/scene/temp2.obj"
+        )
+        is_mesh = scn.offset_face_number(path, path2)
+        self.assertTrue(is_mesh)
