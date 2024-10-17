@@ -69,6 +69,13 @@ class ModelTest(TestCase):
                 Path(file).unlink()
         except FileNotFoundError:
             pass
+        try:
+            path = Path(settings.MEDIA_ROOT).joinpath("uploads/cadinspector/scene/")
+            list = [e for e in path.iterdir() if e.is_file()]
+            for file in list:
+                Path(file).unlink()
+        except FileNotFoundError:
+            pass
 
     def test_entity_str_method(self):
         ent = Entity.objects.get(title="Foo")
@@ -172,3 +179,37 @@ class ModelTest(TestCase):
         doc = ezdxf.readfile(scn.dxf.path)
         layer_dict = scn.make_layer_dict(doc)
         self.assertEqual(layer_dict["0"], "#FFFFFF")
+
+    def test_scene_save_method(self):
+        scn = Scene.objects.get(title="Foo")
+        stg_before = scn.staged_entities.first()
+        dxf_path = Path(settings.BASE_DIR).joinpath(
+            "cadinspector/static/cadinspector/tests/sample.dxf"
+        )
+        with open(dxf_path, "rb") as fdxf:
+            dxf_content = fdxf.read()
+        scn.dxf = SimpleUploadedFile("sample.dxf", dxf_content, "image/x-dxf")
+        scn.save()
+        self.assertIsNot(scn.dxf.name, "uploads/cadinspector/scene/sample.dxf")
+        stg_after = scn.staged_entities.first()
+        self.assertIsNot(stg_before.id, stg_after.id)
+
+    def test_entity_creation_process(self):
+        scn = Scene.objects.get(title="Foo")
+        doc = ezdxf.readfile(scn.dxf.path)
+        msp = doc.modelspace()
+        path = Path(settings.MEDIA_ROOT).joinpath("uploads/cadinspector/scene/temp.obj")
+        scn.record_vertex_number(path, msp, "red")
+        with open(path, "r") as f:
+            for line in f:
+                if line.startswith("# total vertices="):
+                    break
+        self.assertEqual(line, "# total vertices=24\n")
+        path2 = Path(settings.MEDIA_ROOT).joinpath(
+            "uploads/cadinspector/scene/temp2.obj"
+        )
+        is_mesh = scn.offset_face_number(path, path2)
+        self.assertTrue(is_mesh)
+        scn.create_staged_entity(path2, "red", "#FF0000")
+        stg = Staging.objects.last()
+        self.assertEqual(stg.data, {"Layer": "red"})
