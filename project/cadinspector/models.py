@@ -3,6 +3,7 @@ from pathlib import Path
 
 import ezdxf
 import nh3
+import numpy as np
 from colorfield.fields import ColorField
 from django.conf import settings
 from django.core.files import File
@@ -237,7 +238,11 @@ class Scene(models.Model):
             is_mesh = self.offset_face_number(path, path2)
             if not is_mesh:
                 continue
-            entity = self.create_block_entity(path2, block)  # noqa
+            entity = self.create_block_entity(path2, block)
+            # we look for insertions of the block
+            for ins in msp.query(f"INSERT[name=='{block.name}']"):
+                color = layer_dict[ins.dxf.layer]
+                self.create_block_insertion(ins, block.name, entity, color)
 
     def make_layer_dict(self, doc):
         layer_dict = {}
@@ -311,6 +316,32 @@ class Scene(models.Model):
                 obj_model=File(f, name="object.obj"),
             )
         return entity
+
+    def create_block_insertion(self, ins, block_name, entity, color):
+        # extract attributes
+        attrib_dict = {}
+        if ins.attribs:
+            for attr in ins.attribs:
+                attrib_dict[attr.dxf.tag] = attr.dxf.text
+        # for 3D rotated insertions we need origin of local coords
+        origin = ins.ucs().origin
+        # and vectors of local coords...
+        R = np.asarray([list(ins.ucs().ux), list(ins.ucs().uy), list(ins.ucs().uz)])
+        # ...to extract 3D rotation of insertion
+        yaw, roll, pitch, gimbal_lock = self.rotation_matrix_to_euler_angles_zyx(R)
+        Staging.objects.create(
+            scene=self,
+            entity=entity,
+            color=color,
+            position=(f"{origin[0]} {origin[2]} {-origin[1]}"),
+            rotation=f"{degrees(-pitch)} {degrees(-yaw)} {degrees(roll)}",
+            scale=f"{ins.dxf.xscale} {ins.dxf.zscale} {ins.dxf.yscale}",
+            data={
+                "Block": block_name,
+                "Layer": ins.dxf.layer,
+                "attribs": attrib_dict,
+            },
+        )
 
     def rotation_matrix_to_euler_angles_zyx(self, R):
         """
