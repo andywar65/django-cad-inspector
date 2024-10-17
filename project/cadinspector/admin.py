@@ -15,7 +15,7 @@ class EntityAdmin(admin.ModelAdmin):
     inlines = [
         MaterialImageInline,
     ]
-    actions = ["check_file_names"]
+    actions = ["check_file_names", "delete_unstaged_entities"]
 
     @admin.action(description=_("Check material and image file names"))
     def check_file_names(self, request, queryset):
@@ -35,6 +35,18 @@ class EntityAdmin(admin.ModelAdmin):
                     % {"name": ent.mtl_model.name},
                     messages.SUCCESS,
                 )
+
+    @admin.action(description=_("Delete unstaged entities"))
+    def delete_unstaged_entities(self, request, queryset):
+        staged = Staging.objects.values_list("entity", flat=True)
+        for ent in queryset:
+            if ent.id not in staged:
+                self.message_user(
+                    request,
+                    _("Deleted unstaged entity: %(title)s") % {"title": ent.title},
+                    messages.WARNING,
+                )
+                ent.delete()
 
 
 class StagingInline(admin.TabularInline):
