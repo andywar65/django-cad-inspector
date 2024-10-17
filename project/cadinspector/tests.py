@@ -180,7 +180,7 @@ class ModelTest(TestCase):
         layer_dict = scn.make_layer_dict(doc)
         self.assertEqual(layer_dict["0"], "#FFFFFF")
 
-    def test_record_vertex_number(self):
+    def test_entity_creation_process(self):
         scn = Scene.objects.get(title="Foo")
         doc = ezdxf.readfile(scn.dxf.path)
         msp = doc.modelspace()
