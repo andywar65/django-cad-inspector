@@ -191,3 +191,8 @@ class ModelTest(TestCase):
                 if line.startswith("# total vertices="):
                     break
         self.assertEqual(line, "# total vertices=24\n")
+        path2 = Path(settings.MEDIA_ROOT).joinpath(
+            "uploads/cadinspector/scene/temp2.obj"
+        )
+        is_mesh = scn.offset_face_number(path, path2)
+        self.assertTrue(is_mesh)
