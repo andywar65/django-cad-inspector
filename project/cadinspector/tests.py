@@ -69,6 +69,13 @@ class ModelTest(TestCase):
                 Path(file).unlink()
         except FileNotFoundError:
             pass
+        try:
+            path = Path(settings.MEDIA_ROOT).joinpath("uploads/cadinspector/scene/")
+            list = [e for e in path.iterdir() if e.is_file()]
+            for file in list:
+                Path(file).unlink()
+        except FileNotFoundError:
+            pass
 
     def test_entity_str_method(self):
         ent = Entity.objects.get(title="Foo")
@@ -172,3 +179,15 @@ class ModelTest(TestCase):
         doc = ezdxf.readfile(scn.dxf.path)
         layer_dict = scn.make_layer_dict(doc)
         self.assertEqual(layer_dict["0"], "#FFFFFF")
+
+    def test_record_vertex_number(self):
+        scn = Scene.objects.get(title="Foo")
+        doc = ezdxf.readfile(scn.dxf.path)
+        msp = doc.modelspace()
+        path = Path(settings.MEDIA_ROOT).joinpath("uploads/cadinspector/scene/temp.obj")
+        scn.record_vertex_number(path, msp, "red")
+        with open(path, "r") as f:
+            for line in f:
+                if line.startswith("# total vertices="):
+                    break
+        self.assertEqual(line, "# total vertices=24\n")
