@@ -292,3 +292,33 @@ class ModelTest(TestCase):
         self.assertEqual(yaw, 1.2246467991473535e-16)
         self.assertEqual(roll, -0.0)
         self.assertEqual(pitch, 0.523598775598299)
+
+    def test_scene_list_view_status_code(self):
+        response = self.client.get(
+            reverse(
+                "cadinspector:scene_list",
+            )
+        )
+        self.assertEqual(response.status_code, 200)
+
+    def test_entity_list_view_status_code(self):
+        response = self.client.get(
+            reverse(
+                "cadinspector:entity_list",
+            )
+        )
+        self.assertEqual(response.status_code, 200)
+
+    def test_scene_detail_view_status_code(self):
+        scn = Scene.objects.get(title="Foo")
+        response = self.client.get(
+            reverse("cadinspector:scene_detail", kwargs={"pk": scn.id})
+        )
+        self.assertEqual(response.status_code, 200)
+
+    def test_entity_detail_view_status_code(self):
+        ent = Entity.objects.get(title="Foo")
+        response = self.client.get(
+            reverse("cadinspector:entity_detail", kwargs={"pk": ent.id})
+        )
+        self.assertEqual(response.status_code, 200)
