@@ -12,6 +12,19 @@
           </a>
         </li>
       {% endif %}
+      {% if no_cursor %}
+        <li>
+          <a href="{% url 'cadinspector:scene_detail' pk=object.id %}">
+            {% trans "Show cursor" %}
+          </a>
+        </li>
+      {% else %}
+        <li>
+          <a href="{% url 'cadinspector:scene_detail' pk=object.id %}?no-cursor=true">
+            {% trans "Hide cursor" %}
+          </a>
+        </li>
+      {% endif %}
       <li>
         <a href="{% url 'cadinspector:scene_list' %}">
           {% trans "All scenes" %}
@@ -21,20 +34,22 @@
   </details>
   <a-scene style="width: 100%; height: 600px" embedded>
     {% with stagings=object.staged_entities.all %}
-      <a-camera>
-        <a-cursor></a-cursor>
-        {% for staging in stagings %}
-          {% if staging.popupContent %}
-            <a-entity id="text-staging-{{ staging.id }}"
-                      geometry="primitive: plane; height: 0; width: 0"
-                      material="color: white"
-                      text="width: 0.5; value: {{ staging.popupContent }}; color: black; wrapCount: 40"
-                      visible="false"
-                      position="0.3 0 -0.5">
-            </a-entity>
-          {% endif %}
-        {% endfor %}
-      </a-camera>
+      {% if not no_cursor %}
+        <a-camera>
+          <a-cursor></a-cursor>
+          {% for staging in stagings %}
+            {% if staging.popupContent %}
+              <a-entity id="text-staging-{{ staging.id }}"
+                        geometry="primitive: plane; height: 0; width: 0"
+                        material="color: white"
+                        text="width: 0.5; value: {{ staging.popupContent }}; color: black; wrapCount: 40"
+                        visible="false"
+                        position="0.3 0 -0.5">
+              </a-entity>
+            {% endif %}
+          {% endfor %}
+        </a-camera>
+      {% endif %}
       <a-assets>
         {% if object.image %}<img id="sky-image" src="{{ object.image.url }}">{% endif %}
         {% for staging in stagings %}
@@ -57,7 +72,7 @@
             <a-entity obj-model="obj: #obj-file-{{ staging.entity.id }}{% if staging.entity.mtl_model %}; mtl: #mtl-file-{{ staging.entity.id }}{% endif %}"
                       {% if staging.entity.switch %}rotation="-90 0 0"{% endif %}
                       {% if not staging.entity.mtl_model %}material="color: {{ staging.color }}"{% endif %}
-                      {% if staging.data %}
+                      {% if staging.data and not no_cursor %}
                         event-set__enter="_event: mouseenter; _target: #text-staging-{{ staging.id }}; visible: true"
                         event-set__leave="_event: mouseleave; _target: #text-staging-{{ staging.id }}; visible: false"
                       {% endif %}>
