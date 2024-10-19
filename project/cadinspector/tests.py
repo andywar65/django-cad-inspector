@@ -308,6 +308,14 @@ class ModelTest(TestCase):
         )
         self.assertEqual(response.status_code, 200)
 
+    def test_scene_detail_view_no_cursor(self):
+        scn = Scene.objects.get(title="Foo")
+        response = self.client.get(
+            reverse("cadinspector:scene_detail", kwargs={"pk": scn.id})
+            + "?no-cursor=true"
+        )
+        self.assertTrue("no_cursor" in response.context)
+
     def test_entity_detail_view_status_code(self):
         ent = Entity.objects.get(title="Foo")
         response = self.client.get(
