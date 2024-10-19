@@ -59,6 +59,10 @@ class ModelTest(TestCase):
                 "Key": "<script>alert('Foo')</script>",
             },
         )
+        Entity.objects.create(
+            title="Bar",
+            description="baz",
+        )
 
     @classmethod
     def tearDownClass(cls):
@@ -141,6 +145,34 @@ class ModelTest(TestCase):
             f"Checked images for file: {ent.mtl_model.name}",
             messages,
         )
+
+    def test_action_delete_unstaged_entities_status_code(self):
+        staged = Entity.objects.get(title="Foo")
+        unstaged = Entity.objects.get(title="Bar")
+        data = {
+            "action": "delete_unstaged_entities",
+            "_selected_action": [staged.id, unstaged.id],
+        }
+        change_url = reverse("admin:cadinspector_entity_changelist")
+        self.client.login(username="boss", password="p4s5w0r6")
+        response = self.client.post(change_url, data, follow=True)
+        self.client.logout()
+        self.assertEqual(response.status_code, 200)
+
+    def test_action_delete_unstaged_entities_messages(self):
+        staged = Entity.objects.get(title="Foo")
+        unstaged = Entity.objects.get(title="Bar")
+        data = {
+            "action": "delete_unstaged_entities",
+            "_selected_action": [staged.id, unstaged.id],
+        }
+        change_url = reverse("admin:cadinspector_entity_changelist")
+        self.client.login(username="boss", password="p4s5w0r6")
+        response = self.client.post(change_url, data, follow=True)
+        self.client.logout()
+        messages = [m.message for m in get_messages(response.wsgi_request)]
+        self.assertIn(f"Deleted unstaged entity: {unstaged.title}", messages)
+        self.assertNotIn(f"Deleted unstaged entity: {staged.title}", messages)
 
     def test_scene_str_method(self):
         scn = Scene.objects.get(title="Foo")
@@ -260,3 +292,59 @@ class ModelTest(TestCase):
         self.assertEqual(yaw, 1.2246467991473535e-16)
         self.assertEqual(roll, -0.0)
         self.assertEqual(pitch, 0.523598775598299)
+
+    def test_scene_list_view_status_code(self):
+        response = self.client.get(reverse("cadinspector:scene_list"))
+        self.assertEqual(response.status_code, 200)
+
+    def test_entity_list_view_status_code(self):
+        response = self.client.get(reverse("cadinspector:entity_list"))
+        self.assertEqual(response.status_code, 200)
+
+    def test_scene_detail_view_status_code(self):
+        scn = Scene.objects.get(title="Foo")
+        response = self.client.get(
+            reverse("cadinspector:scene_detail", kwargs={"pk": scn.id})
+        )
+        self.assertEqual(response.status_code, 200)
+
+    def test_entity_detail_view_status_code(self):
+        ent = Entity.objects.get(title="Foo")
+        response = self.client.get(
+            reverse("cadinspector:entity_detail", kwargs={"pk": ent.id})
+        )
+        self.assertEqual(response.status_code, 200)
+
+    def test_scene_list_view_status_template_used(self):
+        response = self.client.get(reverse("cadinspector:scene_list"))
+        self.assertTemplateUsed(response, "cadinspector/scene_list.html")
+
+    def test_entity_list_view_status_template_used(self):
+        response = self.client.get(reverse("cadinspector:entity_list"))
+        self.assertTemplateUsed(response, "cadinspector/entity_list.html")
+
+    def test_scene_detail_view_status_template_used(self):
+        scn = Scene.objects.get(title="Foo")
+        response = self.client.get(
+            reverse("cadinspector:scene_detail", kwargs={"pk": scn.id})
+        )
+        self.assertTemplateUsed(response, "cadinspector/scene_detail.html")
+
+    def test_entity_detail_view_status_template_used(self):
+        ent = Entity.objects.get(title="Foo")
+        response = self.client.get(
+            reverse("cadinspector:entity_detail", kwargs={"pk": ent.id})
+        )
+        self.assertTemplateUsed(response, "cadinspector/entity_detail.html")
+
+    def test_home_view_status_code(self):
+        response = self.client.get("/3d")
+        self.assertEqual(response.status_code, 301)
+
+    def test_home_view_status_code_follow(self):
+        response = self.client.get("/3d", follow=True)
+        self.assertEqual(response.status_code, 200)
+
+    def test_home_view_status_template_used_follow(self):
+        response = self.client.get("/3d", follow=True)
+        self.assertTemplateUsed(response, "cadinspector/scene_list.html")

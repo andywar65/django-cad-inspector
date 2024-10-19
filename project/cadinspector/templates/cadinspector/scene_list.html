@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+  <details>
+    <summary style="font-size: 1.875em;">{% trans "All Scenes" %}</summary>
+    <ul>
+      {% if perms.cadinspector.add_scene %}
+        <li>
+          <a href="/admin/cadinspector/scene/add">
+            {% trans "Add Scene" %}
+          </a>
+        </li>
+      {% endif %}
+      <li>
+        <a href="{% url 'cadinspector:entity_list' %}">
+          {% trans "Entity list" %}
+        </a>
+      </li>
+    </ul>
+  </details>
+  {% if object_list %}
+    <table>
+      <tbody>
+        {% for object in object_list %}
+          <tr id="scene-row-{{ object.id }}">
+            <td>
+              <a href="{% url 'cadinspector:scene_detail' pk=object.id %}">
+                {{ object.title }}
+              </a>
+            </td>
+            <td>
+              {{ object.description|truncatewords:10 }}
+            </td>
+            {% if perms.cadinspector.change_scene %}
+              <td>
+                <a href="/admin/cadinspector/scene/{{ object.id }}/change">
+                  {% trans "Modify" %}
+                </a>
+              </td>
+            {% endif %}
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>{% trans "No scenes yet" %}</p>
+  {% endif %}
+{% endblock content %}

@@ -1,0 +1,39 @@
+{% extends "cadinspector/base_head.html" %}
+{% load i18n %}
+
+{% block content %}
+  <details>
+    <summary style="font-size: 1.875em;">{% trans "Entity" %}: {{ object.title }}</summary>
+    <ul>
+      {% if perms.cadinspector.change_entity %}
+        <li>
+          <a href="/admin/cadinspector/entity/{{ object.id }}/change">
+            {% trans "Change Entity" %}
+          </a>
+        </li>
+      {% endif %}
+      <li>
+        <a href="{% url 'cadinspector:entity_list' %}">
+          {% trans "All entities" %}
+        </a>
+      </li>
+    </ul>
+  </details>
+  <a-scene style="width: 100%; height: 600px" embedded>
+    <a-assets>
+      {% if object.gltf_model %}
+        <a-asset-item id="gltf-file" src="{{ object.gltf_model.url }}"></a-asset-item>
+      {% elif object.obj_model %}
+        <a-asset-item id="obj-file" src="{{ object.obj_model.url }}"></a-asset-item>
+        {% if object.mtl_model %}<a-asset-item id="mtl-file" src="{{ object.mtl_model.url }}"></a-asset-item>{% endif %}
+      {% endif %}
+    </a-assets>
+    {% if object.gltf_model %}
+      <a-entity gltf-model="#gltf-file"></a-entity>
+    {% elif object.obj_model %}
+      <a-entity obj-model="obj: #obj-file{% if object.mtl_model %}; mtl: #mtl-file{% endif %}"
+                {% if object.switch %}rotation="-90 0 0"{% endif %}>
+      </a-entity>
+    {% endif %}
+  </a-scene>
+{% endblock content %}
