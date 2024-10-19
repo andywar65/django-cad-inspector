@@ -336,3 +336,15 @@ class ModelTest(TestCase):
             reverse("cadinspector:entity_detail", kwargs={"pk": ent.id})
         )
         self.assertTemplateUsed(response, "cadinspector/entity_detail.html")
+
+    def test_home_view_status_code(self):
+        response = self.client.get("/3d")
+        self.assertEqual(response.status_code, 301)
+
+    def test_home_view_status_code_follow(self):
+        response = self.client.get("/3d", follow=True)
+        self.assertEqual(response.status_code, 200)
+
+    def test_home_view_status_template_used_follow(self):
+        response = self.client.get("/3d", follow=True)
+        self.assertTemplateUsed(response, "cadinspector/scene_list.html")
