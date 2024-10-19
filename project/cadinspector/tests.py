@@ -294,19 +294,11 @@ class ModelTest(TestCase):
         self.assertEqual(pitch, 0.523598775598299)
 
     def test_scene_list_view_status_code(self):
-        response = self.client.get(
-            reverse(
-                "cadinspector:scene_list",
-            )
-        )
+        response = self.client.get(reverse("cadinspector:scene_list"))
         self.assertEqual(response.status_code, 200)
 
     def test_entity_list_view_status_code(self):
-        response = self.client.get(
-            reverse(
-                "cadinspector:entity_list",
-            )
-        )
+        response = self.client.get(reverse("cadinspector:entity_list"))
         self.assertEqual(response.status_code, 200)
 
     def test_scene_detail_view_status_code(self):
@@ -322,3 +314,25 @@ class ModelTest(TestCase):
             reverse("cadinspector:entity_detail", kwargs={"pk": ent.id})
         )
         self.assertEqual(response.status_code, 200)
+
+    def test_scene_list_view_status_template_used(self):
+        response = self.client.get(reverse("cadinspector:scene_list"))
+        self.assertTemplateUsed(response, "cadinspector/scene_list.html")
+
+    def test_entity_list_view_status_template_used(self):
+        response = self.client.get(reverse("cadinspector:entity_list"))
+        self.assertTemplateUsed(response, "cadinspector/entity_list.html")
+
+    def test_scene_detail_view_status_template_used(self):
+        scn = Scene.objects.get(title="Foo")
+        response = self.client.get(
+            reverse("cadinspector:scene_detail", kwargs={"pk": scn.id})
+        )
+        self.assertTemplateUsed(response, "cadinspector/scene_detail.html")
+
+    def test_entity_detail_view_status_template_used(self):
+        ent = Entity.objects.get(title="Foo")
+        response = self.client.get(
+            reverse("cadinspector:entity_detail", kwargs={"pk": ent.id})
+        )
+        self.assertTemplateUsed(response, "cadinspector/entity_detail.html")
