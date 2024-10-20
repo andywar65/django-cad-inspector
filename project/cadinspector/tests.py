@@ -3,7 +3,7 @@ from pathlib import Path
 import ezdxf
 import numpy as np
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Group, User
 from django.contrib.messages import get_messages
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
@@ -81,6 +81,9 @@ class ModelTest(TestCase):
                 Path(file).unlink()
         except FileNotFoundError:
             pass
+
+    def test_cad_inspector_group_exists(self):
+        self.assertTrue(Group.objects.filter(name="CAD Inspector").exists())
 
     def test_entity_str_method(self):
         ent = Entity.objects.get(title="Foo")
