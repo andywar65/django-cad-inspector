@@ -228,10 +228,8 @@ class Scene(models.Model):
             self.create_staged_entity(path2, name, color)
         # iterate over blocks
         for block in doc.blocks:
-            # TODO add list of blacklisted blocks
-            if block.name in [
-                "*Model_Space",
-            ]:
+            # filter blacklisted blocks
+            if block.name in settings.CAD_BLOCK_BLACKLIST:
                 continue
             query = block.query("MESH")
             self.record_vertex_number(path, query)
@@ -247,6 +245,9 @@ class Scene(models.Model):
     def make_layer_dict(self, doc):
         layer_dict = {}
         for layer in doc.layers:
+            # filter blacklisted layers
+            if layer.dxf.name in settings.CAD_LAYER_BLACKLIST:
+                continue
             if layer.rgb:
                 color = self.cad2hex(layer.rgb)
             else:

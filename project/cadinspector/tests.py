@@ -3,7 +3,7 @@ from pathlib import Path
 import ezdxf
 import numpy as np
 from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Group, User
 from django.contrib.messages import get_messages
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
@@ -13,6 +13,8 @@ from .models import Entity, MaterialImage, Scene, Staging
 
 
 @override_settings(MEDIA_ROOT=Path(settings.MEDIA_ROOT).joinpath("tests"))
+@override_settings(CAD_LAYER_BLACKLIST=["Defpoints"])
+@override_settings(CAD_BLOCK_BLACKLIST=["*Model_Space"])
 class ModelTest(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -81,6 +83,9 @@ class ModelTest(TestCase):
                 Path(file).unlink()
         except FileNotFoundError:
             pass
+
+    def test_cad_inspector_group_exists(self):
+        self.assertTrue(Group.objects.filter(name="CAD Inspector").exists())
 
     def test_entity_str_method(self):
         ent = Entity.objects.get(title="Foo")
@@ -218,6 +223,12 @@ class ModelTest(TestCase):
         layer_dict = scn.make_layer_dict(doc)
         self.assertEqual(layer_dict["0"], "#FFFFFF")
 
+    def test_make_layer_dict_blacklist(self):
+        scn = Scene.objects.get(title="Foo")
+        doc = ezdxf.readfile(scn.dxf.path)
+        layer_dict = scn.make_layer_dict(doc)
+        self.assertFalse("Defpoints" in layer_dict)
+
     def test_scene_save_method(self):
         scn = Scene.objects.get(title="Foo")
         stg_before = scn.staged_entities.first()
@@ -231,6 +242,9 @@ class ModelTest(TestCase):
         self.assertIsNot(scn.dxf.name, "uploads/cadinspector/scene/sample.dxf")
         stg_after = scn.staged_entities.first()
         self.assertIsNot(stg_before.id, stg_after.id)
+        self.assertFalse(
+            scn.staged_entities.filter(entity__title="Block *Model_Space").exists()
+        )
 
     def test_entity_creation_process(self):
         scn = Scene.objects.get(title="Foo")
@@ -307,6 +321,14 @@ class ModelTest(TestCase):
             reverse("cadinspector:scene_detail", kwargs={"pk": scn.id})
         )
         self.assertEqual(response.status_code, 200)
+
+    def test_scene_detail_view_no_cursor(self):
+        scn = Scene.objects.get(title="Foo")
+        response = self.client.get(
+            reverse("cadinspector:scene_detail", kwargs={"pk": scn.id})
+            + "?no-cursor=true"
+        )
+        self.assertTrue("no_cursor" in response.context)
 
     def test_entity_detail_view_status_code(self):
         ent = Entity.objects.get(title="Foo")
