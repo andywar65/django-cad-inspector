@@ -14,6 +14,7 @@ from .models import Entity, MaterialImage, Scene, Staging
 
 @override_settings(MEDIA_ROOT=Path(settings.MEDIA_ROOT).joinpath("tests"))
 @override_settings(CAD_LAYER_BLACKLIST=["Defpoints"])
+@override_settings(CAD_BLOCK_BLACKLIST=["*Model_Space"])
 class ModelTest(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -241,6 +242,9 @@ class ModelTest(TestCase):
         self.assertIsNot(scn.dxf.name, "uploads/cadinspector/scene/sample.dxf")
         stg_after = scn.staged_entities.first()
         self.assertIsNot(stg_before.id, stg_after.id)
+        self.assertFalse(
+            scn.staged_entities.filter(entity__title="Block *Model_Space").exists()
+        )
 
     def test_entity_creation_process(self):
         scn = Scene.objects.get(title="Foo")

@@ -116,7 +116,7 @@ USE_I18N = True
 USE_TZ = True
 
 CAD_LAYER_BLACKLIST = ["Defpoints"]
-CAD_BLOCK_BLACKLIST = []
+CAD_BLOCK_BLACKLIST = ["*Model_Space"]
 
 
 # Static files (CSS, JavaScript, Images)
