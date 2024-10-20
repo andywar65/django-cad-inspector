@@ -115,6 +115,9 @@ USE_I18N = True
 
 USE_TZ = True
 
+CAD_LAYER_BLACKLIST = ["Defpoints"]
+CAD_BLOCK_BLACKLIST = []
+
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/

@@ -247,6 +247,8 @@ class Scene(models.Model):
     def make_layer_dict(self, doc):
         layer_dict = {}
         for layer in doc.layers:
+            if layer.dxf.name in settings.CAD_LAYER_BLACKLIST:
+                continue
             if layer.rgb:
                 color = self.cad2hex(layer.rgb)
             else:

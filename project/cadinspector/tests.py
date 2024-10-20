@@ -13,6 +13,7 @@ from .models import Entity, MaterialImage, Scene, Staging
 
 
 @override_settings(MEDIA_ROOT=Path(settings.MEDIA_ROOT).joinpath("tests"))
+@override_settings(CAD_LAYER_BLACKLIST=["Defpoints"])
 class ModelTest(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -220,6 +221,12 @@ class ModelTest(TestCase):
         doc = ezdxf.readfile(scn.dxf.path)
         layer_dict = scn.make_layer_dict(doc)
         self.assertEqual(layer_dict["0"], "#FFFFFF")
+
+    def test_make_layer_dict_blacklist(self):
+        scn = Scene.objects.get(title="Foo")
+        doc = ezdxf.readfile(scn.dxf.path)
+        layer_dict = scn.make_layer_dict(doc)
+        self.assertFalse("Defpoints" in layer_dict)
 
     def test_scene_save_method(self):
         scn = Scene.objects.get(title="Foo")
