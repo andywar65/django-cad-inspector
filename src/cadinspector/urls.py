@@ -5,7 +5,7 @@ from .views import EntityDetailView, EntityListView, SceneDetailView, SceneListV
 
 app_name = "cadinspector"
 urlpatterns = [
-    path("", RedirectView.as_view(pattern_name="cadinspector:scene_list")),
+    path("", RedirectView.as_view(pattern_name="cadinspector:scene_list"), name="home"),
     path("entity/", EntityListView.as_view(), name="entity_list"),
     path("entity/<pk>/", EntityDetailView.as_view(), name="entity_detail"),
     path("scene/", SceneListView.as_view(), name="scene_list"),

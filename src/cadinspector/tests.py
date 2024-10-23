@@ -360,13 +360,13 @@ class ModelTest(TestCase):
         self.assertTemplateUsed(response, "cadinspector/entity_detail.html")
 
     def test_home_view_status_code(self):
-        response = self.client.get("/3d")
-        self.assertEqual(response.status_code, 301)
+        response = self.client.get(reverse("cadinspector:home"))
+        self.assertEqual(response.status_code, 302)
 
     def test_home_view_status_code_follow(self):
-        response = self.client.get("/3d", follow=True)
+        response = self.client.get(reverse("cadinspector:home"), follow=True)
         self.assertEqual(response.status_code, 200)
 
     def test_home_view_status_template_used_follow(self):
-        response = self.client.get("/3d", follow=True)
+        response = self.client.get(reverse("cadinspector:home"), follow=True)
         self.assertTemplateUsed(response, "cadinspector/scene_list.html")
