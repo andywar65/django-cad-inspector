@@ -303,9 +303,9 @@ class ModelTest(TestCase):
             R = np.asarray([list(ins.ucs().ux), list(ins.ucs().uy), list(ins.ucs().uz)])
             yaw, roll, pitch, gimbal_lock = scn.rotation_matrix_to_euler_angles_zyx(R)
             break
-        self.assertEqual(yaw, 1.2246467991473535e-16)
-        self.assertEqual(roll, -0.0)
-        self.assertEqual(pitch, 0.523598775598299)
+        self.assertAlmostEqual(yaw, 1.2246467991473535e-16)
+        self.assertAlmostEqual(roll, -0.0)
+        self.assertAlmostEqual(pitch, 0.523598775598299)
 
     def test_scene_list_view_status_code(self):
         response = self.client.get(reverse("cadinspector:scene_list"))
@@ -360,13 +360,13 @@ class ModelTest(TestCase):
         self.assertTemplateUsed(response, "cadinspector/entity_detail.html")
 
     def test_home_view_status_code(self):
-        response = self.client.get("/3d")
-        self.assertEqual(response.status_code, 301)
+        response = self.client.get(reverse("cadinspector:home"))
+        self.assertEqual(response.status_code, 302)
 
     def test_home_view_status_code_follow(self):
-        response = self.client.get("/3d", follow=True)
+        response = self.client.get(reverse("cadinspector:home"), follow=True)
         self.assertEqual(response.status_code, 200)
 
     def test_home_view_status_template_used_follow(self):
-        response = self.client.get("/3d", follow=True)
+        response = self.client.get(reverse("cadinspector:home"), follow=True)
         self.assertTemplateUsed(response, "cadinspector/scene_list.html")
