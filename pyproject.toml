@@ -3,3 +3,42 @@ target-version = ['py312']
 
 [tool.isort]
 profile = "black"
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "django-cad-inspector"
+version = "0.1.0"
+authors = [
+  { name="andywar65", email="andy.war1965@gmail.com" },
+]
+description = "Import CAD drawings into Django and inspect them in VR with A-Frame"
+readme = "README.rst"
+license = {file = "LICENSE"}
+classifiers = [
+    "Operating System :: OS Independent",
+    "Framework :: Django",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.12",
+]
+requires-python = ">=3.12"
+dependencies = [
+    "Django>=5.1,<6.0",
+    "django-colorfield",
+    "ezdxf",
+    "nh3",
+    "Pillow",
+]
+
+[project.urls]
+Repository = "https://github.com/andywar65/django-cad-inspector"
+
+[project.optional-dependencies]
+dev = [
+    "build",
+    "coverage",
+    "pre-commit",
+    "twine",
+]
