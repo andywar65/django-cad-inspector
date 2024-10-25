@@ -144,8 +144,7 @@ class Entity(models.Model):
                     h_f.write(line)
         # copy material file back
         with open(mtl_path, "w") as m_f, open(helper_path, "r") as h_f:
-            for line in h_f:
-                m_f.write(line)
+            copyfileobj(h_f, m_f)
 
 
 class MaterialImage(models.Model):
