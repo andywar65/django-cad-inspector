@@ -28,7 +28,7 @@ classifiers = [
 ]
 requires-python = ">=3.9"
 dependencies = [
-    "Django>=4.2,<6.0",
+    "Django>=4.2",
     "django-colorfield",
     "ezdxf",
     "nh3",
