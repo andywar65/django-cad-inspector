@@ -120,31 +120,26 @@ class Entity(models.Model):
         mtl_path = Path(self.mtl_model.path)
         # copy helper from material file
         with open(mtl_path, "r") as m_f, open(helper_path, "w") as h_f:
-            # TODO refactor next loop
             for line in m_f:
                 if "map_Ka " in line:
-                    start = line.split("map_Ka ")[0]
-                    rest = line.split("map_Ka ")[-1]
-                    name = rest.split(".")[0]
-                    for key, value in image_dict.items():
-                        if name == key:
-                            h_f.write(line)
-                        elif name in key:
-                            h_f.write(f"{start}map_Ka {key}.{value}\n")
+                    self.replace_filename(image_dict, line, "map_Ka ", h_f)
                 elif "map_Kd " in line:
-                    start = line.split("map_Kd ")[0]
-                    rest = line.split("map_Kd ")[-1]
-                    name = rest.split(".")[0]
-                    for key, value in image_dict.items():
-                        if name == key:
-                            h_f.write(line)
-                        elif name in key:
-                            h_f.write(f"{start}map_Kd {key}.{value}\n")
+                    self.replace_filename(image_dict, line, "map_Kd ", h_f)
                 else:
                     h_f.write(line)
         # copy material file back
         with open(mtl_path, "w") as m_f, open(helper_path, "r") as h_f:
             copyfileobj(h_f, m_f)
+
+    def replace_filename(self, image_dict, line, str, h_f):
+        start = line.split(str)[0]
+        rest = line.split(str)[-1]
+        name = rest.split(".")[0]
+        for key, value in image_dict.items():
+            if name == key:
+                h_f.write(line)
+            elif name in key:
+                h_f.write(f"{start}{str}{key}.{value}\n")
 
 
 class MaterialImage(models.Model):
