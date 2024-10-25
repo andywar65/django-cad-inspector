@@ -1,5 +1,6 @@
 from math import asin, atan2, copysign, cos, degrees, fabs, pi
 from pathlib import Path
+from shutil import copyfileobj
 
 import ezdxf
 import nh3
@@ -94,12 +95,14 @@ class Entity(models.Model):
             for line in o_f:
                 if line.startswith("mtllib"):
                     h_f.write(f"mtllib {mtl_name}\n")
+                    # copy the rest of the object file
+                    copyfileobj(o_f, h_f)
+                    break
                 else:
                     h_f.write(line)
         # copy object file back
         with open(obj_path, "w") as o_f, open(helper_path, "r") as h_f:
-            for line in h_f:
-                o_f.write(line)
+            copyfileobj(h_f, o_f)
 
     def check_image_file_name(self):
         # this function should be called only if

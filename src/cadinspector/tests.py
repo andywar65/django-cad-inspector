@@ -103,9 +103,9 @@ class ModelTest(TestCase):
             "uploads/cadinspector/entity/blue.obj"
         )
         with open(path, "r") as f:
-            for line in f:
-                self.assertEqual(line, "mtllib blue_changed.mtl\n")
-                break
+            self.assertEqual(f.readline(), "Foo\n")
+            self.assertEqual(f.readline(), "mtllib blue_changed.mtl\n")
+            self.assertEqual(f.readline(), "bar\n")
 
     def test_entity_check_image_file_name(self):
         ent = Entity.objects.get(title="Foo")
