@@ -1,2 +1,1 @@
-recursive-include src/cadinspector/static *
 recursive-include src/cadinspector/templates *

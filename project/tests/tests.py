@@ -9,7 +9,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
 from django.urls import reverse
 
-from .models import Entity, MaterialImage, Scene, Staging
+from cadinspector.models import Entity, MaterialImage, Scene, Staging
 
 
 @override_settings(MEDIA_ROOT=Path(settings.MEDIA_ROOT).joinpath("tests"))
@@ -18,18 +18,14 @@ from .models import Entity, MaterialImage, Scene, Staging
 class ModelTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        obj_path = Path(settings.BASE_DIR).joinpath(
-            "cadinspector/static/cadinspector/tests/blue.obj"
-        )
+        obj_path = Path(settings.BASE_DIR).joinpath("tests/static/tests/blue.obj")
         mtl_path = Path(settings.BASE_DIR).joinpath(
-            "cadinspector/static/cadinspector/tests/blue_changed.mtl"
+            "tests/static/tests/blue_changed.mtl"
         )
         img_path = Path(settings.BASE_DIR).joinpath(
-            "cadinspector/static/cadinspector/tests/image_changed.jpg"
+            "tests/static/tests/image_changed.jpg"
         )
-        dxf_path = Path(settings.BASE_DIR).joinpath(
-            "cadinspector/static/cadinspector/tests/sample.dxf"
-        )
+        dxf_path = Path(settings.BASE_DIR).joinpath("tests/static/tests/sample.dxf")
         with open(obj_path, "rb") as fobj:
             obj_content = fobj.read()
         with open(mtl_path, "rb") as fmtl:
@@ -233,9 +229,7 @@ class ModelTest(TestCase):
     def test_scene_save_method(self):
         scn = Scene.objects.get(title="Foo")
         stg_before = scn.staged_entities.first()
-        dxf_path = Path(settings.BASE_DIR).joinpath(
-            "cadinspector/static/cadinspector/tests/sample.dxf"
-        )
+        dxf_path = Path(settings.BASE_DIR).joinpath("tests/static/tests/sample.dxf")
         with open(dxf_path, "rb") as fdxf:
             dxf_content = fdxf.read()
         scn.dxf = SimpleUploadedFile("sample.dxf", dxf_content, "image/x-dxf")
