@@ -62,3 +62,5 @@ Once in the A-Frame window, if you press `Ctrl + Alt + i` you will open the [A-F
 Create entities with lights, add shadows and some physics.
 ## Tests
 Testing is done with unittest. At the moment coverage is 97%. Tested for Django 4.2 against Python 3.9, 3.10, 3.11, 3.12 versions and for Django 5.1 against Python 3.10, 3.11, 3.12 versions (3.13 on Windows).
+## Changelog
+- 0.2.0: First working version

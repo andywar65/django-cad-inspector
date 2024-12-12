@@ -409,6 +409,10 @@ class Staging(models.Model):
         null=True,
         blank=True,
     )
+    wireframe = models.BooleanField(
+        _("Data sheet"),
+        default=False,
+    )
 
     class Meta:
         verbose_name = _("Staging")
