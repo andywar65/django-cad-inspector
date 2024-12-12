@@ -1,7 +1,1 @@
-django>=5.1,<6.0
-ezdxf
-coverage
-pre-commit
-Pillow
-nh3
-django-colorfield
+-e ../django-cad-inspector[dev]
