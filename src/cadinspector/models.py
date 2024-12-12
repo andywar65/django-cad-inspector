@@ -388,19 +388,19 @@ class Staging(models.Model):
     position = models.CharField(
         _("Position"),
         default="0 0 0",
-        max_length=50,
+        max_length=100,
         help_text="Left/Right - Up/Down - In/Out",
     )
     rotation = models.CharField(
         _("Rotation"),
         default="0 0 0",
-        max_length=50,
+        max_length=100,
         help_text="Pitch - Yaw - Roll",
     )
     scale = models.CharField(
         _("Scale"),
         default="1 1 1",
-        max_length=50,
+        max_length=100,
         help_text="Width - Heigth - Depth",
     )
     color = ColorField(_("Color"), default="#FFFFFF")
@@ -410,7 +410,7 @@ class Staging(models.Model):
         blank=True,
     )
     wireframe = models.BooleanField(
-        _("Data sheet"),
+        _("Wireframe"),
         default=False,
     )
 

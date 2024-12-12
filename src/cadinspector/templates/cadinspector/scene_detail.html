@@ -71,7 +71,7 @@
           {% elif staging.entity.obj_model %}
             <a-entity obj-model="obj: #obj-file-{{ staging.entity.id }}{% if staging.entity.mtl_model %}; mtl: #mtl-file-{{ staging.entity.id }}{% endif %}"
                       {% if staging.entity.switch %}rotation="-90 0 0"{% endif %}
-                      {% if not staging.entity.mtl_model %}material="color: {{ staging.color }}"{% endif %}
+                      {% if not staging.entity.mtl_model %}material="color: {{ staging.color }}{% if staging.wireframe %}; wireframe: true{% endif %}"{% endif %}
                       {% if staging.data and not no_cursor %}
                         event-set__enter="_event: mouseenter; _target: #text-staging-{{ staging.id }}; visible: true"
                         event-set__leave="_event: mouseleave; _target: #text-staging-{{ staging.id }}; visible: false"
