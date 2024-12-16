@@ -73,8 +73,8 @@
                       {% if staging.entity.switch %}rotation="-90 0 0"{% endif %}
                       {% if not staging.entity.mtl_model %}material="color: {{ staging.color }}{% if staging.wireframe %}; wireframe: true{% endif %}"{% endif %}
                       {% if staging.data and not no_cursor %}
-                        event-set__enter="_event: mouseenter; _target: #text-staging-{{ staging.id }}; visible: true"
-                        event-set__leave="_event: mouseleave; _target: #text-staging-{{ staging.id }}; visible: false"
+                        event-set__open="_event: mousedown; _target: #text-staging-{{ staging.id }}; visible: true"
+                        event-set__close_leave="_event: mouseleave; _target: #text-staging-{{ staging.id }}; visible: false"
                       {% endif %}>
             </a-entity>
           {% endif %}
