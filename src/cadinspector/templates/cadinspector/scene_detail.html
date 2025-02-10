@@ -25,6 +25,19 @@
           </a>
         </li>
       {% endif %}
+      {% if lights %}
+        <li>
+          <a href="{% url 'cadinspector:scene_detail' pk=object.id %}">
+            {% trans "Turn off lights" %}
+          </a>
+        </li>
+      {% else %}
+        <li>
+          <a href="{% url 'cadinspector:scene_detail' pk=object.id %}?lights=true">
+            {% trans "Turn on lights" %}
+          </a>
+        </li>
+      {% endif %}
       <li>
         <a href="{% url 'cadinspector:scene_list' %}">
           {% trans "All scenes" %}
