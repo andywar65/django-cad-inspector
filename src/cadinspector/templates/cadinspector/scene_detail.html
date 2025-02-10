@@ -46,6 +46,9 @@
     </ul>
   </details>
   <a-scene style="width: 100%; height: 600px" embedded>
+    {% if lights %}
+      <a-entity light="type: ambient; color: #BBB"></a-entity>
+    {% endif %}
     {% with stagings=object.staged_entities.all %}
       {% if not no_cursor %}
         <a-camera>
