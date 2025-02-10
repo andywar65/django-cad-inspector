@@ -28,4 +28,7 @@ class SceneDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         if "no-cursor" in self.request.GET:
             context["no_cursor"] = True
+        if "lights" in self.request.GET:
+            context["no_cursor"] = True
+            context["lights"] = True
         return context

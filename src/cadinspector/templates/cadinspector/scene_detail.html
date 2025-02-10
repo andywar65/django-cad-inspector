@@ -15,13 +15,26 @@
       {% if no_cursor %}
         <li>
           <a href="{% url 'cadinspector:scene_detail' pk=object.id %}">
-            {% trans "Show cursor" %}
+            {% trans "Show entity popups" %}
           </a>
         </li>
       {% else %}
         <li>
           <a href="{% url 'cadinspector:scene_detail' pk=object.id %}?no-cursor=true">
-            {% trans "Hide cursor" %}
+            {% trans "Hide entity popups" %}
+          </a>
+        </li>
+      {% endif %}
+      {% if lights %}
+        <li>
+          <a href="{% url 'cadinspector:scene_detail' pk=object.id %}">
+            {% trans "Turn off lights" %}
+          </a>
+        </li>
+      {% else %}
+        <li>
+          <a href="{% url 'cadinspector:scene_detail' pk=object.id %}?lights=true">
+            {% trans "Turn on lights" %}
           </a>
         </li>
       {% endif %}
@@ -33,6 +46,11 @@
     </ul>
   </details>
   <a-scene style="width: 100%; height: 600px" embedded>
+    {% if lights %}
+      <a-entity light="type: ambient;
+                       color: #BBB;
+                       intensity: 0.8;"></a-entity>
+    {% endif %}
     {% with stagings=object.staged_entities.all %}
       {% if not no_cursor %}
         <a-camera>
@@ -48,6 +66,20 @@
               </a-entity>
             {% endif %}
           {% endfor %}
+        </a-camera>
+      {% endif %}
+      {% if lights %}
+        <a-camera>
+          <a-entity light="type: spot;
+                           color: #FFF;
+                           intensity: 0.6;
+                           distance: 10;
+                           castShadow: true;
+                           penumbra: 0.1;
+                           shadowCameraVisible: false;"
+                    position="1 0.5 0"
+                    rotation="-10 5 0">
+          </a-entity>
         </a-camera>
       {% endif %}
       <a-assets>
@@ -67,15 +99,17 @@
                   rotation="{{ staging.rotation }}"
                   scale="{{ staging.scale }}">
           {% if staging.entity.gltf_model %}
-            <a-entity gltf-model="#gltf-file-{{ staging.entity.id }}"></a-entity>
+            <a-entity gltf-model="#gltf-file-{{ staging.entity.id }}"
+                      {% if lights %}shadow="cast: true; receive: true"{% endif %}></a-entity>
           {% elif staging.entity.obj_model %}
             <a-entity obj-model="obj: #obj-file-{{ staging.entity.id }}{% if staging.entity.mtl_model %}; mtl: #mtl-file-{{ staging.entity.id }}{% endif %}"
                       {% if staging.entity.switch %}rotation="-90 0 0"{% endif %}
-                      {% if not staging.entity.mtl_model %}material="color: {{ staging.color }}"{% endif %}
+                      {% if not staging.entity.mtl_model %}material="color: {{ staging.color }}{% if staging.wireframe %}; wireframe: true{% endif %}"{% endif %}
                       {% if staging.data and not no_cursor %}
-                        event-set__enter="_event: mouseenter; _target: #text-staging-{{ staging.id }}; visible: true"
-                        event-set__leave="_event: mouseleave; _target: #text-staging-{{ staging.id }}; visible: false"
-                      {% endif %}>
+                        event-set__open="_event: mousedown; _target: #text-staging-{{ staging.id }}; visible: true"
+                        event-set__close_leave="_event: mouseleave; _target: #text-staging-{{ staging.id }}; visible: false"
+                      {% endif %}
+                      {% if lights %}shadow="cast: true; receive: true"{% endif %}>
             </a-entity>
           {% endif %}
         </a-entity>
