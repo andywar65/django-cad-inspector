@@ -47,7 +47,9 @@
   </details>
   <a-scene style="width: 100%; height: 600px" embedded>
     {% if lights %}
-      <a-entity light="type: ambient; color: #BBB"></a-entity>
+      <a-entity light="type: ambient;
+                       color: #BBB;
+                       intensity: 0.8;"></a-entity>
     {% endif %}
     {% with stagings=object.staged_entities.all %}
       {% if not no_cursor %}
@@ -64,6 +66,20 @@
               </a-entity>
             {% endif %}
           {% endfor %}
+        </a-camera>
+      {% endif %}
+      {% if lights %}
+        <a-camera>
+          <a-entity light="type: spot;
+                           color: #FFF;
+                           intensity: 0.6;
+                           distance: 10;
+                           castShadow: true;
+                           penumbra: 0.1;
+                           shadowCameraVisible: false;"
+                    position="1 0.5 0"
+                    rotation="-10 5 0">
+          </a-entity>
         </a-camera>
       {% endif %}
       <a-assets>
@@ -83,7 +99,8 @@
                   rotation="{{ staging.rotation }}"
                   scale="{{ staging.scale }}">
           {% if staging.entity.gltf_model %}
-            <a-entity gltf-model="#gltf-file-{{ staging.entity.id }}"></a-entity>
+            <a-entity gltf-model="#gltf-file-{{ staging.entity.id }}"
+                      {% if lights %}shadow="cast: true; receive: true"{% endif %}></a-entity>
           {% elif staging.entity.obj_model %}
             <a-entity obj-model="obj: #obj-file-{{ staging.entity.id }}{% if staging.entity.mtl_model %}; mtl: #mtl-file-{{ staging.entity.id }}{% endif %}"
                       {% if staging.entity.switch %}rotation="-90 0 0"{% endif %}
@@ -91,7 +108,8 @@
                       {% if staging.data and not no_cursor %}
                         event-set__open="_event: mousedown; _target: #text-staging-{{ staging.id }}; visible: true"
                         event-set__close_leave="_event: mouseleave; _target: #text-staging-{{ staging.id }}; visible: false"
-                      {% endif %}>
+                      {% endif %}
+                      {% if lights %}shadow="cast: true; receive: true"{% endif %}>
             </a-entity>
           {% endif %}
         </a-entity>
