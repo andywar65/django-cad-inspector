@@ -101,8 +101,9 @@ insertions when pitch rotation is 90 or -90 degrees. Visit the site at
 ``http://127.0.0.1:8000/3d`` again. Finally the ``Scene`` is listed.
 Click on the link and access the ``A-Frame`` virtual reality: hold down
 the right mouse button to look around, and use ``WASD`` keys to move.
-When the cursor moves on an object, a popup with data should appear (if
-data is associated to the staged entity).
+When the cursor moves on an object and you click on it, a popup with
+data should appear (if data is associated to the staged entity). Leave
+the object and the popup will disappear.
 
 Entities
 ~~~~~~~~
@@ -124,6 +125,14 @@ update. Add a ``Staged entity``, select one of the ``Entities`` you
 created previously, adjust ``color``, ``position``, ``rotation`` and
 ``scale``. Stage as many entities you want (even multiple specimens of
 the same entity), then update the Scene.
+
+Shadows
+~~~~~~~
+
+When inspecting a scene, click on the dropdown next to the scene title:
+you will be able to inspect the scene without popups and / or with
+shadows casted on entities. The latter functionality is resource
+consuming.
 
 Entity utilities
 ----------------
@@ -162,7 +171,7 @@ from the whole scene, and then add it to an ``Entity``.
 Next steps
 ----------
 
-Create entities with lights, add shadows and some physics.
+Create entities with lights, add some physics.
 
 Tests
 -----
@@ -170,3 +179,12 @@ Tests
 Testing is done with unittest. At the moment coverage is 97%. Tested for
 Django 4.2 against Python 3.9, 3.10, 3.11, 3.12 versions and for Django
 5.1 against Python 3.10, 3.11, 3.12 versions (3.13 on Windows).
+
+Changelog
+---------
+
+-  0.3.1: Small fix to lamp position
+-  0.3.0: Staged entities may be presented in wireframe mode (if
+   upgrading from 0.2.0, migrate models). Popups show up when the entity
+   is clicked on. You can turn on shadows casted by a portable lamp.
+-  0.2.0: First working version
