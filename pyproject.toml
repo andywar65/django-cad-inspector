@@ -10,7 +10,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "django-cad-inspector"
-version = "0.3.0"
+version = "0.3.1"
 authors = [
   { name="andywar65", email="andy.war1965@gmail.com" },
 ]
