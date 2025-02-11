@@ -65,6 +65,7 @@ Create entities with lights, add some physics.
 ## Tests
 Testing is done with unittest. At the moment coverage is 97%. Tested for Django 4.2 against Python 3.9, 3.10, 3.11, 3.12 versions and for Django 5.1 against Python 3.10, 3.11, 3.12 versions (3.13 on Windows).
 ## Changelog
+- 0.3.2: Also Stagings in admin
 - 0.3.1: Small fix to lamp position
 - 0.3.0: Staged entities may be presented in wireframe mode (if upgrading from 0.2.0, migrate models). Popups show up when the entity is clicked on. You can turn on shadows casted by a portable lamp.
 - 0.2.0: First working version

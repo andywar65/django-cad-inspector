@@ -183,6 +183,7 @@ Django 4.2 against Python 3.9, 3.10, 3.11, 3.12 versions and for Django
 Changelog
 ---------
 
+-  0.3.2: Also Stagings in admin
 -  0.3.1: Small fix to lamp position
 -  0.3.0: Staged entities may be presented in wireframe mode (if
    upgrading from 0.2.0, migrate models). Popups show up when the entity
