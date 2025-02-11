@@ -52,6 +52,11 @@ class EntityAdmin(admin.ModelAdmin):
 class StagingInline(admin.TabularInline):
     model = Staging
     extra = 0
+    fields = [
+        "entity",
+        "color",
+        "wireframe",
+    ]
 
 
 @admin.register(Scene)
@@ -60,3 +65,8 @@ class SceneAdmin(admin.ModelAdmin):
     inlines = [
         StagingInline,
     ]
+
+
+@admin.register(Staging)
+class StagingAdmin(admin.ModelAdmin):
+    list_display = ("id", "scene", "entity")
