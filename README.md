@@ -1,8 +1,9 @@
 # django-cad-inspector
 Import CAD drawings into [Django](https://djangoproject.com) and inspect them in VR with [A-Frame](https://aframe.io/docs/1.6.0/introduction/)
 ## Requirements
-This project is tested on Django 5.1.2 and Python 3.12. It heavily relies on outstanding [ezdxf](https://ezdxf.mozman.at/) for handling DXF files, [django-colorfield](https://github.com/fabiocaccamo/django-colorfield) for admin color fields.
+This project is tested on Django 5.1.6 and Python 3.13. It heavily relies on outstanding [ezdxf](https://ezdxf.mozman.at/) for handling DXF files, [django-colorfield](https://github.com/fabiocaccamo/django-colorfield) for admin color fields.
 ## Installation from PyPI
+WARNING: see below before upgrading to version 0.4.0, breaking changes!
 Activate your virtual environment and install with:
 ```
 python -m pip install django-cad-inspector
@@ -29,6 +30,8 @@ CAD_BLOCK_BLACKLIST = [...]
 ```
 Here you can store names of layers and blocks you don't want to be processed.
 Migrate and create a superuser.
+### Upgrading to version >=0.4.0 from earlier
+Some breaking changes (app name change). Before upgrading download your models as fixtures: `python manage.py dumpdata cadinspector -o somefile.json`, open the file and change all occourences of `cadinspector.` into `django_cad_inspector.`. Finally upgrade the package and reload the fixtures: `python manage.py loaddata somefile.json`
 ### Templates
 You also need a `base.html` template with following template blocks (a sample `base.html` is provided among package templates).
 ```

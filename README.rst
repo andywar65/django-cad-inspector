@@ -17,6 +17,7 @@ for admin color fields.
 Installation from PyPI
 ----------------------
 
+WARNING: see below before upgrading to version 0.4.0, breaking changes!
 Activate your virtual environment and install with:
 
 ::
@@ -50,6 +51,15 @@ Add two lists to ``my_project/settings.py``:
 
 Here you can store names of layers and blocks you don't want to be
 processed. Migrate and create a superuser.
+
+Upgrading to version 0.4.0 from earlier
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Some breaking changes (app name change).
+Before upgrading download your models as fixtures:
+``python manage.py dumpdata cadinspector -o somefile.json``,
+open the file and change all occourences of ``cadinspector.`` into ``django_cad_inspector.``.
+Finally upgrade the package and reload the fixtures: ``python manage.py loaddata somefile.json``
 
 Templates
 ~~~~~~~~~
