@@ -23,8 +23,8 @@ from django.views.generic import RedirectView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("", RedirectView.as_view(pattern_name="cadinspector:scene_list")),
-    path("3d/", include("cadinspector.urls", namespace="cadinspector")),
+    path("", RedirectView.as_view(pattern_name="django_cad_inspector:scene_list")),
+    path("3d/", include("django_cad_inspector.urls", namespace="django_cad_inspector")),
 ]
 
 if settings.DEBUG:

@@ -26,7 +26,7 @@ class Entity(models.Model):
         _("GLTF file"),
         help_text=_("Overrides OBJ/MTL entries"),
         max_length=200,
-        upload_to="uploads/cadinspector/entity/",
+        upload_to="uploads/django_cad_inspector/entity/",
         validators=[
             FileExtensionValidator(
                 allowed_extensions=[
@@ -41,7 +41,7 @@ class Entity(models.Model):
     obj_model = models.FileField(
         _("OBJ file"),
         max_length=200,
-        upload_to="uploads/cadinspector/entity/",
+        upload_to="uploads/django_cad_inspector/entity/",
         validators=[
             FileExtensionValidator(
                 allowed_extensions=[
@@ -55,7 +55,7 @@ class Entity(models.Model):
     mtl_model = models.FileField(
         _("MTL file"),
         max_length=200,
-        upload_to="uploads/cadinspector/entity/",
+        upload_to="uploads/django_cad_inspector/entity/",
         validators=[
             FileExtensionValidator(
                 allowed_extensions=[
@@ -87,7 +87,7 @@ class Entity(models.Model):
         mtl_name = self.mtl_model.name.split("/")[-1]
         # get file paths for object file and helper file
         helper_path = Path(settings.MEDIA_ROOT).joinpath(
-            "uploads/cadinspector/entity/temp.obj"
+            "uploads/django_cad_inspector/entity/temp.obj"
         )
         obj_path = Path(self.obj_model.path)
         # copy helper from object file
@@ -115,7 +115,7 @@ class Entity(models.Model):
             image_dict[img_name.split(".")[0]] = img_name.split(".")[1]
         # get file paths for material file and helper file
         helper_path = Path(settings.MEDIA_ROOT).joinpath(
-            "uploads/cadinspector/entity/temp.obj"
+            "uploads/django_cad_inspector/entity/temp.obj"
         )
         mtl_path = Path(self.mtl_model.path)
         # copy helper from material file
@@ -149,7 +149,9 @@ class MaterialImage(models.Model):
         related_name="material_images",
         verbose_name=_("Material image"),
     )
-    image = models.ImageField(_("Image"), upload_to="uploads/cadinspector/entity/")
+    image = models.ImageField(
+        _("Image"), upload_to="uploads/django_cad_inspector/entity/"
+    )
 
     def __str__(self):
         return Path(self.image.url).name
@@ -165,7 +167,7 @@ class Scene(models.Model):
         _("DXF file"),
         help_text=_("Please, transform 3DSolids into Meshes before upload"),
         max_length=200,
-        upload_to="uploads/cadinspector/scene/",
+        upload_to="uploads/django_cad_inspector/scene/",
         null=True,
         blank=True,
         validators=[
@@ -179,7 +181,7 @@ class Scene(models.Model):
     image = models.ImageField(
         _("Background image"),
         help_text=_("Please provide an equirectangular image"),
-        upload_to="uploads/cadinspector/scene/",
+        upload_to="uploads/django_cad_inspector/scene/",
         null=True,
         blank=True,
     )
@@ -211,9 +213,11 @@ class Scene(models.Model):
         # get model space
         msp = doc.modelspace()
         # prepare two helper files
-        path = Path(settings.MEDIA_ROOT).joinpath("uploads/cadinspector/scene/temp.obj")
+        path = Path(settings.MEDIA_ROOT).joinpath(
+            "uploads/django_cad_inspector/scene/temp.obj"
+        )
         path2 = Path(settings.MEDIA_ROOT).joinpath(
-            "uploads/cadinspector/scene/temp2.obj"
+            "uploads/django_cad_inspector/scene/temp2.obj"
         )
         # iterate over layers
         for name, color in layer_dict.items():

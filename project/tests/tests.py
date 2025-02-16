@@ -9,7 +9,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase, override_settings
 from django.urls import reverse
 
-from cadinspector.models import Entity, MaterialImage, Scene, Staging
+from django_cad_inspector.models import Entity, MaterialImage, Scene, Staging
 
 
 @override_settings(MEDIA_ROOT=Path(settings.MEDIA_ROOT).joinpath("tests"))
@@ -66,14 +66,18 @@ class ModelTest(TestCase):
     def tearDownClass(cls):
         """Checks existing files, then removes them"""
         try:
-            path = Path(settings.MEDIA_ROOT).joinpath("uploads/cadinspector/entity/")
+            path = Path(settings.MEDIA_ROOT).joinpath(
+                "uploads/django_cad_inspector/entity/"
+            )
             list = [e for e in path.iterdir() if e.is_file()]
             for file in list:
                 Path(file).unlink()
         except FileNotFoundError:
             pass
         try:
-            path = Path(settings.MEDIA_ROOT).joinpath("uploads/cadinspector/scene/")
+            path = Path(settings.MEDIA_ROOT).joinpath(
+                "uploads/django_cad_inspector/scene/"
+            )
             list = [e for e in path.iterdir() if e.is_file()]
             for file in list:
                 Path(file).unlink()
@@ -96,7 +100,7 @@ class ModelTest(TestCase):
         ent = Entity.objects.get(title="Foo")
         ent.check_material_file_name()
         path = Path(settings.MEDIA_ROOT).joinpath(
-            "uploads/cadinspector/entity/blue.obj"
+            "uploads/django_cad_inspector/entity/blue.obj"
         )
         with open(path, "r") as f:
             self.assertEqual(f.readline(), "Foo\n")
@@ -107,7 +111,7 @@ class ModelTest(TestCase):
         ent = Entity.objects.get(title="Foo")
         ent.check_image_file_name()
         path = Path(settings.MEDIA_ROOT).joinpath(
-            "uploads/cadinspector/entity/blue_changed.mtl"
+            "uploads/django_cad_inspector/entity/blue_changed.mtl"
         )
         with open(path, "r") as f:
             self.assertEqual(f.readline(), "Foo\n")
@@ -123,7 +127,7 @@ class ModelTest(TestCase):
                 ent.id,
             ],
         }
-        change_url = reverse("admin:cadinspector_entity_changelist")
+        change_url = reverse("admin:django_cad_inspector_entity_changelist")
         self.client.login(username="boss", password="p4s5w0r6")
         response = self.client.post(change_url, data, follow=True)
         self.client.logout()
@@ -137,7 +141,7 @@ class ModelTest(TestCase):
                 ent.id,
             ],
         }
-        change_url = reverse("admin:cadinspector_entity_changelist")
+        change_url = reverse("admin:django_cad_inspector_entity_changelist")
         self.client.login(username="boss", password="p4s5w0r6")
         response = self.client.post(change_url, data, follow=True)
         self.client.logout()
@@ -155,7 +159,7 @@ class ModelTest(TestCase):
             "action": "delete_unstaged_entities",
             "_selected_action": [staged.id, unstaged.id],
         }
-        change_url = reverse("admin:cadinspector_entity_changelist")
+        change_url = reverse("admin:django_cad_inspector_entity_changelist")
         self.client.login(username="boss", password="p4s5w0r6")
         response = self.client.post(change_url, data, follow=True)
         self.client.logout()
@@ -168,7 +172,7 @@ class ModelTest(TestCase):
             "action": "delete_unstaged_entities",
             "_selected_action": [staged.id, unstaged.id],
         }
-        change_url = reverse("admin:cadinspector_entity_changelist")
+        change_url = reverse("admin:django_cad_inspector_entity_changelist")
         self.client.login(username="boss", password="p4s5w0r6")
         response = self.client.post(change_url, data, follow=True)
         self.client.logout()
@@ -234,7 +238,7 @@ class ModelTest(TestCase):
             dxf_content = fdxf.read()
         scn.dxf = SimpleUploadedFile("sample.dxf", dxf_content, "image/x-dxf")
         scn.save()
-        self.assertIsNot(scn.dxf.name, "uploads/cadinspector/scene/sample.dxf")
+        self.assertIsNot(scn.dxf.name, "uploads/django_cad_inspector/scene/sample.dxf")
         stg_after = scn.staged_entities.first()
         self.assertIsNot(stg_before.id, stg_after.id)
         self.assertFalse(
@@ -245,7 +249,9 @@ class ModelTest(TestCase):
         scn = Scene.objects.get(title="Foo")
         doc = ezdxf.readfile(scn.dxf.path)
         msp = doc.modelspace()
-        path = Path(settings.MEDIA_ROOT).joinpath("uploads/cadinspector/scene/temp.obj")
+        path = Path(settings.MEDIA_ROOT).joinpath(
+            "uploads/django_cad_inspector/scene/temp.obj"
+        )
         query = msp.query("MESH[layer=='red']")
         scn.record_vertex_number(path, query)
         with open(path, "r") as f:
@@ -254,7 +260,7 @@ class ModelTest(TestCase):
                     break
         self.assertEqual(line, "# total vertices=24\n")
         path2 = Path(settings.MEDIA_ROOT).joinpath(
-            "uploads/cadinspector/scene/temp2.obj"
+            "uploads/django_cad_inspector/scene/temp2.obj"
         )
         is_mesh = scn.offset_face_number(path, path2)
         self.assertTrue(is_mesh)
@@ -266,7 +272,9 @@ class ModelTest(TestCase):
         scn = Scene.objects.get(title="Foo")
         doc = ezdxf.readfile(scn.dxf.path)
         block = doc.blocks["sample"]
-        path = Path(settings.MEDIA_ROOT).joinpath("uploads/cadinspector/scene/temp.obj")
+        path = Path(settings.MEDIA_ROOT).joinpath(
+            "uploads/django_cad_inspector/scene/temp.obj"
+        )
         query = block.query("MESH")
         scn.record_vertex_number(path, query)
         with open(path, "r") as f:
@@ -275,7 +283,7 @@ class ModelTest(TestCase):
                     break
         self.assertEqual(line, "# total vertices=24\n")
         path2 = Path(settings.MEDIA_ROOT).joinpath(
-            "uploads/cadinspector/scene/temp2.obj"
+            "uploads/django_cad_inspector/scene/temp2.obj"
         )
         is_mesh = scn.offset_face_number(path, path2)
         self.assertTrue(is_mesh)
@@ -303,24 +311,24 @@ class ModelTest(TestCase):
         self.assertAlmostEqual(pitch, 0.523598775598299)
 
     def test_scene_list_view_status_code(self):
-        response = self.client.get(reverse("cadinspector:scene_list"))
+        response = self.client.get(reverse("django_cad_inspector:scene_list"))
         self.assertEqual(response.status_code, 200)
 
     def test_entity_list_view_status_code(self):
-        response = self.client.get(reverse("cadinspector:entity_list"))
+        response = self.client.get(reverse("django_cad_inspector:entity_list"))
         self.assertEqual(response.status_code, 200)
 
     def test_scene_detail_view_status_code(self):
         scn = Scene.objects.get(title="Foo")
         response = self.client.get(
-            reverse("cadinspector:scene_detail", kwargs={"pk": scn.id})
+            reverse("django_cad_inspector:scene_detail", kwargs={"pk": scn.id})
         )
         self.assertEqual(response.status_code, 200)
 
     def test_scene_detail_view_no_cursor(self):
         scn = Scene.objects.get(title="Foo")
         response = self.client.get(
-            reverse("cadinspector:scene_detail", kwargs={"pk": scn.id})
+            reverse("django_cad_inspector:scene_detail", kwargs={"pk": scn.id})
             + "?no-cursor=true"
         )
         self.assertTrue("no_cursor" in response.context)
@@ -328,40 +336,40 @@ class ModelTest(TestCase):
     def test_entity_detail_view_status_code(self):
         ent = Entity.objects.get(title="Foo")
         response = self.client.get(
-            reverse("cadinspector:entity_detail", kwargs={"pk": ent.id})
+            reverse("django_cad_inspector:entity_detail", kwargs={"pk": ent.id})
         )
         self.assertEqual(response.status_code, 200)
 
     def test_scene_list_view_status_template_used(self):
-        response = self.client.get(reverse("cadinspector:scene_list"))
-        self.assertTemplateUsed(response, "cadinspector/scene_list.html")
+        response = self.client.get(reverse("django_cad_inspector:scene_list"))
+        self.assertTemplateUsed(response, "django_cad_inspector/scene_list.html")
 
     def test_entity_list_view_status_template_used(self):
-        response = self.client.get(reverse("cadinspector:entity_list"))
-        self.assertTemplateUsed(response, "cadinspector/entity_list.html")
+        response = self.client.get(reverse("django_cad_inspector:entity_list"))
+        self.assertTemplateUsed(response, "django_cad_inspector/entity_list.html")
 
     def test_scene_detail_view_status_template_used(self):
         scn = Scene.objects.get(title="Foo")
         response = self.client.get(
-            reverse("cadinspector:scene_detail", kwargs={"pk": scn.id})
+            reverse("django_cad_inspector:scene_detail", kwargs={"pk": scn.id})
         )
-        self.assertTemplateUsed(response, "cadinspector/scene_detail.html")
+        self.assertTemplateUsed(response, "django_cad_inspector/scene_detail.html")
 
     def test_entity_detail_view_status_template_used(self):
         ent = Entity.objects.get(title="Foo")
         response = self.client.get(
-            reverse("cadinspector:entity_detail", kwargs={"pk": ent.id})
+            reverse("django_cad_inspector:entity_detail", kwargs={"pk": ent.id})
         )
-        self.assertTemplateUsed(response, "cadinspector/entity_detail.html")
+        self.assertTemplateUsed(response, "django_cad_inspector/entity_detail.html")
 
     def test_home_view_status_code(self):
-        response = self.client.get(reverse("cadinspector:home"))
+        response = self.client.get(reverse("django_cad_inspector:home"))
         self.assertEqual(response.status_code, 302)
 
     def test_home_view_status_code_follow(self):
-        response = self.client.get(reverse("cadinspector:home"), follow=True)
+        response = self.client.get(reverse("django_cad_inspector:home"), follow=True)
         self.assertEqual(response.status_code, 200)
 
     def test_home_view_status_template_used_follow(self):
-        response = self.client.get(reverse("cadinspector:home"), follow=True)
-        self.assertTemplateUsed(response, "cadinspector/scene_list.html")
+        response = self.client.get(reverse("django_cad_inspector:home"), follow=True)
+        self.assertTemplateUsed(response, "django_cad_inspector/scene_list.html")

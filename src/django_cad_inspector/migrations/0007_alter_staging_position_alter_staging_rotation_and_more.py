@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("cadinspector", "0006_staging_wireframe"),
+        ("django_cad_inspector", "0006_staging_wireframe"),
     ]
 
     operations = [

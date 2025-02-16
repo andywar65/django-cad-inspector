@@ -7,22 +7,22 @@ from .models import Entity, Scene
 
 class EntityListView(ListView):
     model = Entity
-    template_name = "cadinspector/entity_list.html"
+    template_name = "django_cad_inspector/entity_list.html"
 
 
 class EntityDetailView(DetailView):
     model = Entity
-    template_name = "cadinspector/entity_detail.html"
+    template_name = "django_cad_inspector/entity_detail.html"
 
 
 class SceneListView(ListView):
     model = Scene
-    template_name = "cadinspector/scene_list.html"
+    template_name = "django_cad_inspector/scene_list.html"
 
 
 class SceneDetailView(DetailView):
     model = Scene
-    template_name = "cadinspector/scene_detail.html"
+    template_name = "django_cad_inspector/scene_detail.html"
 
     def get_context_data(self, **kwargs: Any) -> dict[str, Any]:
         context = super().get_context_data(**kwargs)

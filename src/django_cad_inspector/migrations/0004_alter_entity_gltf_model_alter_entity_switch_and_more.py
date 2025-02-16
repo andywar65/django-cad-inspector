@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         (
-            "cadinspector",
+            "django_cad_inspector",
             "0003_scene_alter_entity_description_alter_entity_switch_and_more",
         ),
     ]
@@ -23,7 +23,7 @@ class Migration(migrations.Migration):
                 help_text="Overrides OBJ/MTL entries",
                 max_length=200,
                 null=True,
-                upload_to="uploads/cadinspector/entity/",
+                upload_to="uploads/django_cad_inspector/entity/",
                 validators=[
                     django.core.validators.FileExtensionValidator(
                         allowed_extensions=["gltf", "glb"]
@@ -48,7 +48,7 @@ class Migration(migrations.Migration):
                 blank=True,
                 help_text="Please provide an equirectangular image",
                 null=True,
-                upload_to="uploads/cadinspector/scene/",
+                upload_to="uploads/django_cad_inspector/scene/",
                 verbose_name="Background image",
             ),
         ),
@@ -106,7 +106,7 @@ class Migration(migrations.Migration):
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="scenes",
-                        to="cadinspector.entity",
+                        to="django_cad_inspector.entity",
                     ),
                 ),
                 (
@@ -114,7 +114,7 @@ class Migration(migrations.Migration):
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="staged_entities",
-                        to="cadinspector.scene",
+                        to="django_cad_inspector.scene",
                     ),
                 ),
             ],

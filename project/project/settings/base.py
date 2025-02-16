@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     # third party
     "colorfield",
     # local
-    "cadinspector",
+    "django_cad_inspector",
 ]
 
 MIDDLEWARE = [

@@ -1,45 +1,45 @@
-{% extends "cadinspector/base_head.html" %}
+{% extends "django_cad_inspector/base_head.html" %}
 {% load i18n %}
 
 {% block content %}
   <details>
     <summary style="font-size: 1.875em;">{% trans "Scene" %}: {{ object.title }}</summary>
     <ul>
-      {% if perms.cadinspector.change_scene %}
+      {% if perms.django_cad_inspector.change_scene %}
         <li>
-          <a href="/admin/cadinspector/scene/{{ object.id }}/change">
+          <a href="/admin/django_cad_inspector/scene/{{ object.id }}/change">
             {% trans "Change Scene" %}
           </a>
         </li>
       {% endif %}
       {% if no_cursor %}
         <li>
-          <a href="{% url 'cadinspector:scene_detail' pk=object.id %}">
+          <a href="{% url 'django_cad_inspector:scene_detail' pk=object.id %}">
             {% trans "Show entity popups" %}
           </a>
         </li>
       {% else %}
         <li>
-          <a href="{% url 'cadinspector:scene_detail' pk=object.id %}?no-cursor=true">
+          <a href="{% url 'django_cad_inspector:scene_detail' pk=object.id %}?no-cursor=true">
             {% trans "Hide entity popups" %}
           </a>
         </li>
       {% endif %}
       {% if lights %}
         <li>
-          <a href="{% url 'cadinspector:scene_detail' pk=object.id %}">
+          <a href="{% url 'django_cad_inspector:scene_detail' pk=object.id %}">
             {% trans "Turn off lights" %}
           </a>
         </li>
       {% else %}
         <li>
-          <a href="{% url 'cadinspector:scene_detail' pk=object.id %}?lights=true">
+          <a href="{% url 'django_cad_inspector:scene_detail' pk=object.id %}?lights=true">
             {% trans "Turn on lights" %}
           </a>
         </li>
       {% endif %}
       <li>
-        <a href="{% url 'cadinspector:scene_list' %}">
+        <a href="{% url 'django_cad_inspector:scene_list' %}">
           {% trans "All scenes" %}
         </a>
       </li>

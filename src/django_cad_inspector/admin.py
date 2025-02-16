@@ -74,7 +74,7 @@ class SceneAdmin(admin.ModelAdmin):
         https://406.ch/writing/django-admin-tip-adding-links-to-related-objects-in-change-forms/
         """
         return render_to_string(
-            "cadinspector/admin_stagings.html",
+            "django_cad_inspector/admin_stagings.html",
             {"stagings": obj.staged_entities.all()},
         )
 
