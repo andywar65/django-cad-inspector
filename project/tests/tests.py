@@ -85,7 +85,7 @@ class ModelTest(TestCase):
             pass
 
     def test_cad_inspector_group_exists(self):
-        self.assertTrue(Group.objects.filter(name="CAD Inspector").exists())
+        self.assertTrue(Group.objects.filter(name="Dj CAD Inspector").exists())
 
     def test_entity_str_method(self):
         ent = Entity.objects.get(title="Foo")

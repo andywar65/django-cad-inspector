@@ -9,7 +9,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.pytest.ini_options]
-DJANGO_SETTINGS_MODULE = "project.settings"
+DJANGO_SETTINGS_MODULE = "project.settings.tests"
 python_files = ["tests.py", ]
 
 [project]
@@ -41,3 +41,8 @@ dependencies = [
 
 [project.urls]
 Repository = "https://github.com/andywar65/django-cad-inspector"
+
+[dependency-groups]
+dev = [
+    "pytest-django>=4.10.0",
+]
