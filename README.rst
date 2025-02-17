@@ -8,7 +8,7 @@ inspect them in VR with
 Requirements
 ------------
 
-This project is tested on Django 5.1.2 and Python 3.12. It heavily
+This project is tested on Django 5.1.6 and Python 3.13. It heavily
 relies on outstanding `ezdxf <https://ezdxf.mozman.at/>`__ for handling
 DXF files,
 `django-colorfield <https://github.com/fabiocaccamo/django-colorfield>`__
