@@ -17,6 +17,7 @@ for admin color fields.
 Installation from PyPI
 ----------------------
 
+WARNING: see below before upgrading to version 0.4.0, breaking changes!
 Activate your virtual environment and install with:
 
 ::
@@ -30,7 +31,7 @@ In your Django project add:
    INSTALLED_APPS = [
        # ...
        "colorfield",
-       "cadinspector",
+       "django_cad_inspector",
    ]
 
 .. code:: python
@@ -38,7 +39,7 @@ In your Django project add:
    # my_project/urls.py
    urlpatterns = [
        # ...
-       path('3d/', include('cadinspector.urls', namespace = 'cadinspector')),
+       path('3d/', include('django_cad_inspector.urls', namespace = 'django_cad_inspector')),
    ]
 
 Add two lists to ``my_project/settings.py``:
@@ -50,6 +51,15 @@ Add two lists to ``my_project/settings.py``:
 
 Here you can store names of layers and blocks you don't want to be
 processed. Migrate and create a superuser.
+
+Upgrading to version 0.4.0 from earlier
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Some breaking changes (app name change).
+Before upgrading download your models as fixtures:
+``python manage.py dumpdata cadinspector -o somefile.json``,
+open the file and change all occourences of ``cadinspector.`` into ``django_cad_inspector.``.
+Finally upgrade the package and reload the fixtures: ``python manage.py loaddata somefile.json``
 
 Templates
 ~~~~~~~~~
@@ -65,9 +75,9 @@ sample ``base.html`` is provided among package templates).
    {% block content %}
    {% endblock content %}
 
-Package comes with four templates, ``cadinspector/entity_list.html``,
-``cadinspector/entity_detail.html``, ``cadinspector/scene_list.html``
-and ``cadinspector/scene_detail.html``. Copy and override them in your
+Package comes with four templates, ``django_cad_inspector/entity_list.html``,
+``django_cad_inspector/entity_detail.html``, ``django_cad_inspector/scene_list.html``
+and ``django_cad_inspector/scene_detail.html``. Copy and override them in your
 project templates if you want to add your styles.
 
 Usage
@@ -109,7 +119,7 @@ Entities
 ~~~~~~~~
 
 You can create ``Entities`` navigating to
-``http://127.0.0.1:8000/admin/cadinspector/entity/add/``: enter a Title
+``http://127.0.0.1:8000/admin/django_cad_inspector/entity/add/``: enter a Title
 and Description, then upload an ``*.obj file``. If provided, the
 associated ``*.mtl file`` and eventual images. Check the ``Switch``
 field if your object was created in CAD: A-Frame coordinate system is
@@ -120,7 +130,7 @@ uploaded, all other formats will be ignored.
 Add Entities to Scenes
 ~~~~~~~~~~~~~~~~~~~~~~
 
-In ``http://127.0.0.1:8000/admin/cadinspector/scene/`` choose a Scene to
+In ``http://127.0.0.1:8000/admin/django_cad_inspector/scene/`` choose a Scene to
 update. Add a ``Staged entity``, select one of the ``Entities`` you
 created previously, adjust ``color``, ``position``, ``rotation`` and
 ``scale``. Stage as many entities you want (even multiple specimens of
@@ -137,7 +147,7 @@ consuming.
 Entity utilities
 ----------------
 
-Navigating to ``http://127.0.0.1:8000/admin/cadinspector/entity/`` shows
+Navigating to ``http://127.0.0.1:8000/admin/django_cad_inspector/entity/`` shows
 list of existing ``Entities``. Two admin actions are implemented to
 manage them:
 
@@ -183,6 +193,7 @@ Django 4.2 against Python 3.9, 3.10, 3.11, 3.12 versions and for Django
 Changelog
 ---------
 
+-  0.4.0: Breaking change: change of app name, see install
 -  0.3.2: Also Stagings in admin
 -  0.3.1: Small fix to lamp position
 -  0.3.0: Staged entities may be presented in wireframe mode (if

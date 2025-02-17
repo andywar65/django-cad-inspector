@@ -1,19 +1,19 @@
-{% extends "cadinspector/base_head.html" %}
+{% extends "django_cad_inspector/base_head.html" %}
 {% load i18n %}
 
 {% block content %}
   <details>
     <summary style="font-size: 1.875em;">{% trans "Entity" %}: {{ object.title }}</summary>
     <ul>
-      {% if perms.cadinspector.change_entity %}
+      {% if perms.django_cad_inspector.change_entity %}
         <li>
-          <a href="/admin/cadinspector/entity/{{ object.id }}/change">
+          <a href="/admin/django_cad_inspector/entity/{{ object.id }}/change">
             {% trans "Change Entity" %}
           </a>
         </li>
       {% endif %}
       <li>
-        <a href="{% url 'cadinspector:entity_list' %}">
+        <a href="{% url 'django_cad_inspector:entity_list' %}">
           {% trans "All entities" %}
         </a>
       </li>

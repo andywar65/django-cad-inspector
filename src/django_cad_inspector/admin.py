@@ -1,4 +1,5 @@
 from django.contrib import admin, messages
+from django.template.loader import render_to_string
 from django.utils.translation import gettext_lazy as _
 
 from .models import Entity, MaterialImage, Scene, Staging
@@ -62,9 +63,20 @@ class StagingInline(admin.TabularInline):
 @admin.register(Scene)
 class SceneAdmin(admin.ModelAdmin):
     list_display = ("title", "description")
+    readonly_fields = ["admin_link_stagings"]
     inlines = [
         StagingInline,
     ]
+
+    @admin.display(description=_("Stagings (edit all fields)"))
+    def admin_link_stagings(self, obj):
+        """Learned this trick here:
+        https://406.ch/writing/django-admin-tip-adding-links-to-related-objects-in-change-forms/
+        """
+        return render_to_string(
+            "django_cad_inspector/admin_stagings.html",
+            {"stagings": obj.staged_entities.all()},
+        )
 
 
 @admin.register(Staging)

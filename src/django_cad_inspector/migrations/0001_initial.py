@@ -35,7 +35,7 @@ class Migration(migrations.Migration):
                         help_text="Overrides all other entries",
                         max_length=200,
                         null=True,
-                        upload_to="uploads/cadinspector/entity/",
+                        upload_to="uploads/django_cad_inspector/entity/",
                         validators=[
                             django.core.validators.FileExtensionValidator(
                                 allowed_extensions=["gltf", "glb"]
@@ -50,7 +50,7 @@ class Migration(migrations.Migration):
                         blank=True,
                         max_length=200,
                         null=True,
-                        upload_to="uploads/cadinspector/entity/",
+                        upload_to="uploads/django_cad_inspector/entity/",
                         validators=[
                             django.core.validators.FileExtensionValidator(
                                 allowed_extensions=["obj"]
@@ -65,7 +65,7 @@ class Migration(migrations.Migration):
                         blank=True,
                         max_length=200,
                         null=True,
-                        upload_to="uploads/cadinspector/entity/",
+                        upload_to="uploads/django_cad_inspector/entity/",
                         validators=[
                             django.core.validators.FileExtensionValidator(
                                 allowed_extensions=["mtl"]

@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("cadinspector", "0002_materialimage"),
+        ("django_cad_inspector", "0002_materialimage"),
     ]
 
     operations = [
@@ -38,7 +38,7 @@ class Migration(migrations.Migration):
                     models.ImageField(
                         blank=True,
                         null=True,
-                        upload_to="uploads/cadinspector/scene/",
+                        upload_to="uploads/django_cad_inspector/scene/",
                         verbose_name="Equirectangular image",
                     ),
                 ),
@@ -49,7 +49,7 @@ class Migration(migrations.Migration):
                         help_text="Please, transform 3DSolids into Meshes before upload",  # noqa
                         max_length=200,
                         null=True,
-                        upload_to="uploads/cadinspector/scene/",
+                        upload_to="uploads/django_cad_inspector/scene/",
                         validators=[
                             django.core.validators.FileExtensionValidator(
                                 allowed_extensions=["dxf"]
@@ -85,7 +85,7 @@ class Migration(migrations.Migration):
             model_name="materialimage",
             name="image",
             field=models.ImageField(
-                upload_to="uploads/cadinspector/entity/", verbose_name="Image"
+                upload_to="uploads/django_cad_inspector/entity/", verbose_name="Image"
             ),
         ),
     ]

@@ -7,7 +7,10 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("cadinspector", "0004_alter_entity_gltf_model_alter_entity_switch_and_more"),
+        (
+            "django_cad_inspector",
+            "0004_alter_entity_gltf_model_alter_entity_switch_and_more",
+        ),
     ]
 
     operations = [

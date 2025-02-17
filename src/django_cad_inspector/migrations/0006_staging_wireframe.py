@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("cadinspector", "0005_alter_staging_color"),
+        ("django_cad_inspector", "0005_alter_staging_color"),
     ]
 
     operations = [

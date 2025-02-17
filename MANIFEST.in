@@ -1,1 +1,1 @@
-recursive-include src/cadinspector/templates *
+recursive-include src/django_cad_inspector/templates *

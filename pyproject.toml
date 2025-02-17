@@ -5,12 +5,16 @@ target-version = ['py312']
 profile = "black"
 
 [build-system]
-requires = ["setuptools", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "project.settings.tests"
+python_files = ["tests.py", ]
 
 [project]
 name = "django-cad-inspector"
-version = "0.3.2"
+version = "0.4.0"
 authors = [
   { name="andywar65", email="andy.war1965@gmail.com" },
 ]
@@ -38,11 +42,7 @@ dependencies = [
 [project.urls]
 Repository = "https://github.com/andywar65/django-cad-inspector"
 
-[project.optional-dependencies]
+[dependency-groups]
 dev = [
-    "build",
-    "coverage",
-    "pre-commit",
-    "twine",
-    "psycopg[binary,pool]",
+    "pytest-django>=4.10.0",
 ]
