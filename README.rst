@@ -8,7 +8,7 @@ inspect them in VR with
 Requirements
 ------------
 
-This project is tested on Django 5.1.6 and Python 3.13. It heavily
+This project is tested on Django 5.2 and Python 3.13. It heavily
 relies on outstanding `ezdxf <https://ezdxf.mozman.at/>`__ for handling
 DXF files,
 `django-colorfield <https://github.com/fabiocaccamo/django-colorfield>`__
@@ -187,12 +187,14 @@ Tests
 -----
 
 Testing is done with unittest. At the moment coverage is 97%. Tested for
-Django 4.2 against Python 3.9, 3.10, 3.11, 3.12 versions and for Django
-5.1 against Python 3.10, 3.11, 3.12 versions (3.13 on Windows).
+Django 4.2 against Python 3.9, 3.10, 3.11, 3.12 versions, for Django
+5.1 against Python 3.10, 3.11, 3.12 versions (3.13 on Windows) and for
+Django 5.2 against Python 3.13.1
 
 Changelog
 ---------
 
+-  0.5.0: Using Django 5.2
 -  0.4.0: Breaking change: change of app name, see install
 -  0.3.2: Also Stagings in admin
 -  0.3.1: Small fix to lamp position

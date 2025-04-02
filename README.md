@@ -1,7 +1,7 @@
 # django-cad-inspector
 Import CAD drawings into [Django](https://djangoproject.com) and inspect them in VR with [A-Frame](https://aframe.io/docs/1.6.0/introduction/)
 ## Requirements
-This project is tested on Django 5.1.6 and Python 3.13. It heavily relies on outstanding [ezdxf](https://ezdxf.mozman.at/) for handling DXF files, [django-colorfield](https://github.com/fabiocaccamo/django-colorfield) for admin color fields.
+This project is tested on Django 5.2 and Python 3.13. It heavily relies on outstanding [ezdxf](https://ezdxf.mozman.at/) for handling DXF files, [django-colorfield](https://github.com/fabiocaccamo/django-colorfield) for admin color fields.
 ## Installation from PyPI
 WARNING: see below before upgrading to version 0.4.0, breaking changes!
 Activate your virtual environment and install with:
@@ -66,8 +66,9 @@ Once in the A-Frame window, if you press `Ctrl + Alt + i` you will open the [A-F
 ## Next steps
 Create entities with lights, add some physics.
 ## Tests
-Testing is done with unittest. At the moment coverage is 97%. Tested for Django 4.2 against Python 3.9, 3.10, 3.11, 3.12 versions and for Django 5.1 against Python 3.10, 3.11, 3.12 versions (3.13 on Windows).
+Testing is done with unittest. At the moment coverage is 97%. Tested for Django 4.2 against Python 3.9, 3.10, 3.11, 3.12 versions, for Django 5.1 against Python 3.10, 3.11, 3.12 versions (3.13 on Windows) and Django 5.2 against Python 3.13.1.
 ## Changelog
+- 0.5.0: Using Django 5.2
 - 0.4.0: Breaking change: change of app name, see install
 - 0.3.2: Also Stagings in admin
 - 0.3.1: Small fix to lamp position
